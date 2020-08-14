@@ -21,8 +21,7 @@ const createButtonsTemplate = (destination) => {
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>`
-    : `<button class="event__reset-btn" type="reset">Cancel</button>`
-    }`;
+    : `<button class="event__reset-btn" type="reset">Cancel</button>`}`;
 };
 
 const createAvailableOffersTemplate = (offers) => {
@@ -55,8 +54,7 @@ const createDestinationInfoTemplate = (destination) => {
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${destination.photos.map((photo) =>
-      `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${destination.photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
         </div>
       </div>
     </section>` : ``}`;
@@ -90,8 +88,8 @@ const createEventEditTemplate = (event = {}) => {
   const iconType = typeName.toLowerCase();
   const transferTypesTemplate = createEventTypeItemsTemplate(type.transfer, type.name);
   const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
-  const start = `${startTime.toLocaleDateString('en-GB', {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString('en-GB', {hour: `2-digit`, minute: `2-digit`})}`;
-  const end = `${endTime.toLocaleDateString('en-GB', {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString('en-GB', {hour: `2-digit`, minute: `2-digit`})}`;
+  const start = `${startTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
+  const end = `${endTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
   const buttonsTemplate = createButtonsTemplate(destination.place);
   const availableOffersTemplate = createAvailableOffersTemplate(offers);
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);

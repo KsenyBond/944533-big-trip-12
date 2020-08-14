@@ -1,5 +1,5 @@
 const generateDatetime = (time) => {
-  time = time.toLocaleString('en-GB');
+  time = time.toLocaleString(`en-GB`);
 
   return `${time.slice(0, 10).split(`/`).reverse().join(`-`)}T${time.slice(12, 17)}`;
 };
@@ -34,8 +34,8 @@ const createEventTemplate = (event) => {
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
   const iconType = typeName.toLowerCase();
-  const start = startTime.toLocaleTimeString('en-GB').slice(0, -3);
-  const end = endTime.toLocaleTimeString('en-GB').slice(0, -3);
+  const start = startTime.toLocaleTimeString(`en-GB`).slice(0, -3);
+  const end = endTime.toLocaleTimeString(`en-GB`).slice(0, -3);
   const datetimeStart = generateDatetime(startTime);
   const datetimeEnd = generateDatetime(endTime);
   const durationDHM = generateDurationDHM(duration);

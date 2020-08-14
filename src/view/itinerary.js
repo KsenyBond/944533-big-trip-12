@@ -1,5 +1,5 @@
 const createTripDaysItemTemplate = (allEvents) => {
-  const allEventsDates = allEvents.map((day) => day.startTime.toLocaleDateString('en-GB'));
+  const allEventsDates = allEvents.map((day) => day.startTime.toLocaleDateString(`en-GB`));
   const eventsUniqueDates = Array.from(new Set(allEventsDates));
 
   return eventsUniqueDates.map((date) =>

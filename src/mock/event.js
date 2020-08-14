@@ -30,16 +30,25 @@ const generateDestination = () => {
     `Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.`,
     `In rutrum ac purus sit amet tempus.`
   ];
+
+  const generateRandomDescription = () => {
+    return destinationRandomDescriptions[getRandomInteger(0, destinationRandomDescriptions.length - 1)];
+  };
+
+  const generateRandomPhotos = () => {
+    return `http://picsum.photos/248/152?r=${Math.random()}`;
+  };
+
   const destinationDescription =
     new Array(getRandomInteger(1, 5))
       .fill()
-      .map(description => description = destinationRandomDescriptions[getRandomInteger(0, destinationRandomDescriptions.length - 1)]);
+      .map(generateRandomDescription);
   const uniqueDestinationDescription = new Set(destinationDescription);
 
   return {
     place: generateValue(destinations),
     description: Array.from(uniqueDestinationDescription).join(` `),
-    photos: new Array(DESTINATION_PHOTOS).fill().map((photo) => `http://picsum.photos/248/152?r=${Math.random()}`),
+    photos: new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos),
   };
 };
 

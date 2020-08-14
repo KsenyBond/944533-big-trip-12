@@ -1,3 +1,5 @@
+import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
+
 const generateDatetime = (time) => {
   time = time.toLocaleString(`en-GB`);
 
@@ -17,6 +19,8 @@ const generateDurationDHM = (milliseconds) => {
 };
 
 const createEventSelectedOffersTemplate = (offers) => {
+  offers = offers.length > 3 ? offers.slice(0, MAX_SELECTED_OFFERS_NUMBER) : offers;
+
   const selectedOffers = offers.map((offer) =>
     `<li class="event__offer">
       <span class="event__offer-title">${offer.name}</span>
@@ -39,7 +43,7 @@ const createEventTemplate = (event) => {
   const datetimeStart = generateDatetime(startTime);
   const datetimeEnd = generateDatetime(endTime);
   const durationDHM = generateDurationDHM(duration);
-  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.selected);
+  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.filter((offer) => offer.isChecked));
 
   return (
     `<li class="trip-events__item">

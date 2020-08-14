@@ -25,23 +25,22 @@ const createButtonsTemplate = (destination) => {
 };
 
 const createAvailableOffersTemplate = (offers) => {
-  const availableOffers = offers.available.map((offer) =>
+  const availableOffers = offers.map((offer) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offers.selected.some((selected) => selected.name === offer.name) ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${offer.type}-1">
         <span class="event__offer-title">${offer.name}</span>
         &plus;
         &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
       </label>
     </div>`);
-  const availableUniqueOffers = new Set(availableOffers);
 
-  return `${offers.available.length ?
+  return `${offers.length ?
     `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${Array.from(availableUniqueOffers).join(``)}
+        ${Array.from(availableOffers).join(``)}
       </div>
     </section>` : ``}`;
 };
@@ -78,9 +77,7 @@ const createEventEditTemplate = (event = {}) => {
     startTime = currentDate,
     endTime = currentDate,
     price = ``,
-    offers = {
-      available: []
-    }
+    offers = []
   } = event;
 
   const typeName = type.name;

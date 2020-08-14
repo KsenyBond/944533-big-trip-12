@@ -1,5 +1,5 @@
-import {getRandomInteger, generateValue} from "../utils.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP} from "../const.js";
+import {getRandomInteger, generateValue, shuffle} from "../utils.js";
+import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP} from "../const.js";
 
 const generateType = () => {
   const types = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
@@ -78,43 +78,27 @@ const generateDuration = (start, end) => {
   return end.getTime() - start.getTime();
 };
 
-const generateRandomOffer = () => {
-  const offers = [
-    {
-      type: `luggage`,
-      name: `Add luggage`,
-      price: 50
-    },
-    {
-      type: `meal`,
-      name: `Add meal`,
-      price: 15
-    },
-    {
-      type: `comfort`,
-      name: `Switch to comfort`,
-      price: 80
-    },
-    {
-      type: `seats`,
-      name: `Choose seats`,
-      price: 5
-    },
-    {
-      type: `train`,
-      name: `Travel by train`,
-      price: 40
-    }
-  ];
-
-  return generateValue(offers);
-};
-
-const generateOffers = (selectedCount, availableCount) => {
-  return {
-    selected: new Array(getRandomInteger(0, selectedCount)).fill().map(generateRandomOffer),
-    available: new Array(getRandomInteger(0, availableCount)).fill().map(generateRandomOffer),
+const generateOffers = () => {
+  const offers = {
+    luggage: `Add luggage`,
+    meal: `Add meal`,
+    comfort: `Switch to comfort`,
+    seats: `Choose seats`,
+    train: `Travel by train`,
+    tickets: `Book tickets`,
+    lunch: `Lunch in city`,
   };
+  const availableOffers = [];
+
+  for (const offerType of Object.keys(offers)) {
+    availableOffers.push({
+      type: offerType,
+      name: offers[offerType],
+      price: getRandomInteger(10, 30),
+      isChecked: Boolean(getRandomInteger(0, 1)),
+    });
+  }
+  return shuffle(availableOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
 };
 
 const generateEvent = () => {
@@ -124,7 +108,7 @@ const generateEvent = () => {
   const endTime = generateEndTime(startTime);
   const duration = generateDuration(startTime, endTime);
   const price = getRandomInteger(10, 250);
-  const offers = generateOffers(MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER);
+  const offers = generateOffers();
 
   return {
     type,

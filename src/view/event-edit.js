@@ -1,3 +1,22 @@
+import {createElement, setNeutralTime} from "../utils.js";
+
+const BLANK_EVENT = {
+  type: {
+    name: `Bus`,
+    transfer: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
+    activity: [`Check-in`, `Sightseeing`, `Restaurant`],
+  },
+  destination: {
+    place: ``,
+    description: ``,
+    photos: ``,
+  },
+  startTime: setNeutralTime(),
+  endTime: setNeutralTime(),
+  price: ``,
+  offers: []
+};
+
 const createEventTypeItemsTemplate = (typesList, currentType) => {
   return typesList.map((type) =>
     `<div class="event__type-item">
@@ -60,25 +79,7 @@ const createDestinationInfoTemplate = (destination) => {
 };
 
 const createEventEditTemplate = (event = {}) => {
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-
-  const {
-    type = {
-      name: `Bus`,
-      transfer: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
-      activity: [`Check-in`, `Sightseeing`, `Restaurant`],
-    },
-    destination = {
-      place: ``,
-      description: ``,
-      photos: ``,
-    },
-    startTime = currentDate,
-    endTime = currentDate,
-    price = ``,
-    offers = []
-  } = event;
+  const {type, destination, startTime, endTime, price, offers} = event;
 
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
@@ -160,4 +161,25 @@ const createEventEditTemplate = (event = {}) => {
   );
 };
 
-export {createEventEditTemplate};
+export default class EventEdit {
+  constructor(event) {
+    this._event = event || BLANK_EVENT;
+    this._element = null;
+  }
+
+  get template() {
+    return createEventEditTemplate(this._event);
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

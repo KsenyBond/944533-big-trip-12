@@ -1,3 +1,5 @@
+import {createElement} from "../utils.js";
+
 const createTripDaysItemTemplate = (allEvents) => {
   const allEventsDates = allEvents.map((day) => day.startTime.toLocaleDateString(`en-GB`));
   const eventsUniqueDates = Array.from(new Set(allEventsDates));
@@ -27,4 +29,25 @@ const createItineraryTemplate = (events = []) => {
   );
 };
 
-export {createItineraryTemplate};
+export default class Itinerary {
+  constructor(events) {
+    this._events = events;
+    this._element = null;
+  }
+
+  get template() {
+    return createItineraryTemplate(this._events);
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

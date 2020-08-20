@@ -1,3 +1,5 @@
+import {createElement} from "../utils.js";
+
 const createTripDatesTemplate = (allEvents) => {
   return `${allEvents.length > 0 ?
     `<p class="trip-info__dates">${allEvents[0].startTime.toDateString().slice(4, 10)}
@@ -35,4 +37,25 @@ const createTripMainInfoTemplate = (events = []) => {
   );
 };
 
-export {createTripMainInfoTemplate};
+export default class TripMainInfo {
+  constructor(events) {
+    this._events = events;
+    this._element = null;
+  }
+
+  get template() {
+    return createTripMainInfoTemplate(this._events);
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,4 +1,5 @@
 import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
+import {createElement} from "../utils.js";
 
 const generateDatetime = (time) => {
   time = time.toLocaleString(`en-GB`);
@@ -79,4 +80,25 @@ const createEventTemplate = (event) => {
   );
 };
 
-export {createEventTemplate};
+export default class Event {
+  constructor(event) {
+    this._event = event;
+    this._element = null;
+  }
+
+  get template() {
+    return createEventTemplate(this._event);
+  }
+
+  get element() {
+    if (!this._element) {
+      this._element = createElement(this.template);
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

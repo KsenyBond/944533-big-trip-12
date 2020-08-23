@@ -5,6 +5,7 @@ import SortView from "./view/sort.js";
 import EventEditView from "./view/event-edit.js";
 import ItineraryView from "./view/itinerary.js";
 import EventView from "./view/event.js";
+import NoEventsView from "./view/no-events";
 import {generateEvent} from "./mock/event.js";
 import {render, RenderPosition} from "./utils.js";
 
@@ -32,11 +33,23 @@ const renderEvent = (tripDayElement, event) => {
     tripDayElement.replaceChild(eventComponent.element, eventEditComponent.element);
   };
 
-  eventComponent.element.querySelector(`.event__rollup-btn`).addEventListener(`click`, replaceEventToEditForm);
+  const EscKeyDownHandler = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      replaceEditFormToEvent();
+      document.removeEventListener(`keydown`, EscKeyDownHandler);
+    }
+  };
+
+  eventComponent.element.querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceEventToEditForm();
+    document.addEventListener(`keydown`, EscKeyDownHandler);
+  });
 
   eventEditComponent.element.addEventListener(`submit`, (evt) => {
     evt.preventDefault();
     replaceEditFormToEvent();
+    document.removeEventListener(`keydown`, EscKeyDownHandler);
   });
 
   render(tripDayElement, eventComponent.element, RenderPosition.BEFORE_END);
@@ -48,14 +61,18 @@ render(siteHeaderControlsElement, new TripFiltersView().element, RenderPosition.
 render(siteMainElement, new SortView().element, RenderPosition.BEFORE_END);
 render(siteMainElement, new ItineraryView(events).element, RenderPosition.BEFORE_END);
 
-const checkDay = (time) => {
-  return time.toLocaleDateString(`en-GB`).split(`/`).reverse().join(`-`);
-};
+if (!events.length) {
+  render(siteMainElement, new NoEventsView().element, RenderPosition.BEFORE_END);
+} else {
+  const checkDay = (time) => {
+    return time.toLocaleDateString(`en-GB`).split(`/`).reverse().join(`-`);
+  };
 
-const renderEvents = (count) => {
-  for (let i = 0; i < count; i++) {
-    renderEvent(siteMainElement.querySelector(`.day${checkDay(events[i].startTime)}`), events[i]);
-  }
-};
+  const renderEvents = (count) => {
+    for (let i = 0; i < count; i++) {
+      renderEvent(siteMainElement.querySelector(`.day${checkDay(events[i].startTime)}`), events[i]);
+    }
+  };
 
-renderEvents(EVENTS_NUMBER);
+  renderEvents(EVENTS_NUMBER);
+}

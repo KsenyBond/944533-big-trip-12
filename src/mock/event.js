@@ -1,4 +1,4 @@
-import {getRandomInteger, generateValue, shuffle} from "../utils.js";
+import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
 import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP} from "../const.js";
 
 const generateType = () => {

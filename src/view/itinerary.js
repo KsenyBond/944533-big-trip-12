@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractView from "./abstract.js";
 
 const createTripDaysItemTemplate = (allEvents) => {
   const allEventsDates = allEvents.map((day) => day.startTime.toLocaleDateString(`en-GB`));
@@ -12,7 +12,7 @@ const createTripDaysItemTemplate = (allEvents) => {
           ${(new Date(date.split(`/`).reverse().join(`-`))).toDateString().slice(4, 10)}
         </time>
       </div>
-      <ul class="trip-events__list day${date.split(`/`).reverse().join(`-`)}">
+      <ul class="trip-events__list" data-datetime="${date.split(`/`).reverse().join(`-`)}">
       </ul>
     </li>`).join(``);
 };
@@ -22,32 +22,18 @@ const createItineraryTemplate = (events = []) => {
 
   const tripDaysItemTemplate = createTripDaysItemTemplate(allEvents);
 
-  return (
-    `<ul class="trip-days">
+  return `<ul class="trip-days">
       ${tripDaysItemTemplate}
-    </ul>`
-  );
+    </ul>`;
 };
 
-export default class Itinerary {
+export default class Itinerary extends AbstractView {
   constructor(events) {
+    super();
     this._events = events;
-    this._element = null;
   }
 
   get template() {
     return createItineraryTemplate(this._events);
-  }
-
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

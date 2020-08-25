@@ -1,4 +1,5 @@
-import {createElement, setNeutralTime} from "../utils.js";
+import {setNeutralTime} from "../utils/common.js";
+import AbstractView from "./abstract.js";
 
 const BLANK_EVENT = {
   type: {
@@ -161,25 +162,25 @@ const createEventEditTemplate = (event = {}) => {
   );
 };
 
-export default class EventEdit {
+export default class EventEdit extends AbstractView {
   constructor(event) {
+    super();
     this._event = event || BLANK_EVENT;
-    this._element = null;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   get template() {
     return createEventEditTemplate(this._event);
   }
 
-  get element() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.element.addEventListener(`submit`, this._formSubmitHandler);
   }
 }

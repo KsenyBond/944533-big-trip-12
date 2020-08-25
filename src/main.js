@@ -12,7 +12,7 @@ const events = new Array(EVENTS_NUMBER)
   .sort((event1, event2) => event1.startTime.getTime() - event2.startTime.getTime());
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
-const siteHeaderControlsElement = document.querySelector(`.trip-main__trip-controls`);
+const siteHeaderControlsElement = siteHeaderMainElement.querySelector(`.trip-main__trip-controls`);
 const siteHeaderControlsHiddenElement = siteHeaderMainElement.querySelector(`.trip-controls .visually-hidden:last-child`);
 const siteItineraryElement = document.querySelector(`.trip-events`);
 

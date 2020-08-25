@@ -2,9 +2,9 @@ import SortView from "../view/sort.js";
 import EventEditView from "../view/event-edit.js";
 import ItineraryView from "../view/itinerary.js";
 import EventView from "../view/event.js";
-import NoEventsView from "../view/no-events";
-import {render, RenderPosition, replaceElement} from "../utils/render";
-import {checkDay} from "../utils/common";
+import NoEventsView from "../view/no-events.js";
+import {render, RenderPosition, replaceElement} from "../utils/render.js";
+import {checkDay} from "../utils/common.js";
 import {EVENTS_NUMBER} from "../const.js";
 
 export default class Trip {
@@ -60,7 +60,7 @@ export default class Trip {
 
   _renderEvents(count) {
     for (let i = 0; i < count; i++) {
-      this._renderEvent(this._tripEventsContainer.querySelector(`.day${checkDay(this.tripEvents[i].startTime)}`), this.tripEvents[i]);
+      this._renderEvent(this._tripEventsContainer.querySelector(`ul[data-datetime="${checkDay(this.tripEvents[i].startTime)}"]`), this.tripEvents[i]);
     }
   }
 

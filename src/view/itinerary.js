@@ -12,7 +12,7 @@ const createTripDaysItemTemplate = (allEvents) => {
           ${(new Date(date.split(`/`).reverse().join(`-`))).toDateString().slice(4, 10)}
         </time>
       </div>
-      <ul class="trip-events__list day${date.split(`/`).reverse().join(`-`)}">
+      <ul class="trip-events__list" data-datetime="${date.split(`/`).reverse().join(`-`)}">
       </ul>
     </li>`).join(``);
 };

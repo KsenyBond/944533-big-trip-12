@@ -1,11 +1,16 @@
 import AbstractView from "./abstract.js";
+import {isTimeSorted, isPriceSorted} from "../utils/common.js";
 
 const createTripDaysItemTemplate = (allEvents) => {
   const allEventsDates = allEvents.map((day) => day.startTime.toLocaleDateString(`en-GB`));
   const eventsUniqueDates = Array.from(new Set(allEventsDates));
 
-  return eventsUniqueDates.map((date) =>
+  return isTimeSorted(allEvents) || isPriceSorted(allEvents) ?
     `<li class="trip-days__item  day">
+      <div class="day__info"></div>
+      <ul class="trip-events__list"></ul>
+    </li>`
+    : eventsUniqueDates.map((date) => `<li class="trip-days__item  day">
       <div class="day__info">
         <span class="day__counter">${eventsUniqueDates.indexOf(date) + 1}</span>
         <time class="day__date" datetime="${date.split(`/`).reverse().join(`-`)}">

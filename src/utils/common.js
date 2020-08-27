@@ -35,4 +35,20 @@ const checkDay = (time) => {
   return time.toLocaleDateString(`en-GB`).split(`/`).reverse().join(`-`);
 };
 
-export {getRandomInteger, generateValue, shuffle, setNeutralTime, checkDay};
+const sortTimeDown = (eventA, eventB) => {
+  return eventB.duration - eventA.duration;
+};
+
+const sortPriceDown = (taskA, taskB) => {
+  return taskB.price - taskA.price;
+};
+
+const isTimeSorted = (events) => {
+  return events.slice(1).every((event, index) => events[index].duration >= event.duration);
+};
+
+const isPriceSorted = (events) => {
+  return events.slice(1).every((event, index) => events[index].price >= event.price);
+};
+
+export {getRandomInteger, generateValue, shuffle, setNeutralTime, checkDay, sortTimeDown, sortPriceDown, isTimeSorted, isPriceSorted};

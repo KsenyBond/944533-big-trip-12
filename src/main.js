@@ -20,5 +20,5 @@ render(siteHeaderMainElement, new TripMainInfoView(events), RenderPosition.AFTER
 render(siteHeaderControlsElement, new TripTabsView(), RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
 render(siteHeaderControlsElement, new TripFiltersView(), RenderPosition.BEFORE_END);
 
-const tripPresenter = new TripPresenter(siteItineraryElement, events);
+const tripPresenter = new TripPresenter(siteItineraryElement);
 tripPresenter.init(events);

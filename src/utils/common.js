@@ -31,8 +31,24 @@ const setNeutralTime = () => {
   return new Date(currentDate);
 };
 
-const checkDay = (time) => {
-  return time.toLocaleDateString(`en-GB`).split(`/`).reverse().join(`-`);
+const transformToDatetime = (date) => {
+  return date.split(`/`).reverse().join(`-`);
 };
 
-export {getRandomInteger, generateValue, shuffle, setNeutralTime, checkDay};
+const transformToMonthDay = (datetime) => {
+  return new Date(datetime).toDateString().slice(4, 10);
+};
+
+const transformToLocaleDate = (event) => {
+  return event.startTime.toLocaleDateString(`en-GB`);
+};
+
+const sortTimeDown = (eventA, eventB) => {
+  return eventB.duration - eventA.duration;
+};
+
+const sortPriceDown = (taskA, taskB) => {
+  return taskB.price - taskA.price;
+};
+
+export {getRandomInteger, generateValue, shuffle, setNeutralTime, transformToDatetime, transformToMonthDay, transformToLocaleDate, sortTimeDown, sortPriceDown};

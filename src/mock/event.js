@@ -1,6 +1,8 @@
 import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
 import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP} from "../const.js";
 
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 const generateType = () => {
   const types = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
@@ -102,6 +104,7 @@ const generateOffers = () => {
 };
 
 const generateEvent = () => {
+  const id = generateId();
   const type = generateType();
   const destination = generateDestination();
   const startTime = generateStartTime();
@@ -111,6 +114,7 @@ const generateEvent = () => {
   const offers = generateOffers();
 
   return {
+    id,
     type,
     destination,
     startTime,
@@ -118,6 +122,7 @@ const generateEvent = () => {
     duration,
     price,
     offers,
+    isFavorite: Boolean(getRandomInteger(0, 1))
   };
 };
 

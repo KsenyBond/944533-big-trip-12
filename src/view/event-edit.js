@@ -15,7 +15,8 @@ const BLANK_EVENT = {
   startTime: setNeutralTime(),
   endTime: setNeutralTime(),
   price: ``,
-  offers: []
+  offers: [],
+  isFavorite: false
 };
 
 const createEventTypeItemsTemplate = (typesList, currentType) => {
@@ -26,11 +27,13 @@ const createEventTypeItemsTemplate = (typesList, currentType) => {
     </div>`).join(``);
 };
 
-const createButtonsTemplate = (destination) => {
+const createButtonsTemplate = (destination, isFavorite) => {
+  const isChecked = isFavorite ? `checked` : ``;
+
   return `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     ${destination ?
     `<button class="event__reset-btn" type="reset">Delete</button>
-     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -80,7 +83,7 @@ const createDestinationInfoTemplate = (destination) => {
 };
 
 const createEventEditTemplate = (event = {}) => {
-  const {type, destination, startTime, endTime, price, offers} = event;
+  const {type, destination, startTime, endTime, price, offers, isFavorite} = event;
 
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
@@ -89,7 +92,7 @@ const createEventEditTemplate = (event = {}) => {
   const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
   const start = `${startTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
   const end = `${endTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
-  const buttonsTemplate = createButtonsTemplate(destination.place);
+  const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(offers);
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
 
@@ -101,7 +104,7 @@ const createEventEditTemplate = (event = {}) => {
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${iconType}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-event__type  event__type-btn-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -163,24 +166,95 @@ const createEventEditTemplate = (event = {}) => {
 };
 
 export default class EventEdit extends AbstractView {
-  constructor(event) {
+  constructor(event = BLANK_EVENT) {
     super();
-    this._event = event || BLANK_EVENT;
+    // this._data = EventEdit.parseEventToData(event);
+    this._event = event;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
   }
 
   get template() {
+    // return createEventEditTemplate(this._data);
     return createEventEditTemplate(this._event);
   }
 
+  // updateData(update) {
+  //   if (!update) {
+  //     return;
+  //   }
+  //
+  //   this._data = Object.assign(
+  //       {},
+  //       this._data,
+  //       update
+  //   );
+  //
+  //   this.updateElement();
+  // }
+
+  // updateElement() {
+  //   let prevElement = this.element;
+  //   const parent = prevElement.parentElement;
+  //   this.removeElement();
+  //
+  //   const newElement = this.element;
+  //
+  //   parent.replaceChild(newElement, prevElement);
+  //   prevElement = null;
+  // }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._event);
+    // this._callback.formSubmit(EventEdit.parseDataToEvent(this._data));
+  }
+
+  _favoriteChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteChange();
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.element.addEventListener(`submit`, this._formSubmitHandler);
   }
+
+  setFavoriteChangeHandler(callback) {
+    this._callback.favoriteChange = callback;
+    this.element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, this._favoriteChangeHandler);
+  }
+
+  // static parseEventToData(event) {
+  //   return Object.assign(
+  //       {},
+  //       event,
+  //       {
+  //         // hasOffers: Boolean(event.offers.length),
+  //         // hasDestination: Boolean(event.destination.description)
+  //       }
+  //   );
+  // }
+  //
+  // static parseDataToEvent(data) {
+  //   data = Object.assign({}, data);
+  //
+  //   // if (!data.hasOffers) {
+  //   //   data.offers = [];
+  //   // }
+  //   //
+  //   // if (!data.hasDestination) {
+  //   //   data.destination = {
+  //   //     place: ``,
+  //   //     description: ``,
+  //   //     photos: ``,
+  //   //   };
+  //   // }
+  //
+  //   // delete data.hasOffers;
+  //   // delete data.hasDestination;
+  //
+  //   return data;
+  // }
 }

@@ -20,6 +20,7 @@ const createTripMainInfoTemplate = (events = []) => {
   const tripDatesTemplate = createTripDatesTemplate(allEvents);
   const totalCostMain = allEvents.length > 0 ? allEvents.reduce((sum, current) => sum + current.price, 0) : 0;
   const totalCostSelectedOffers = allEvents.length > 0 ? allEvents.map((event) => event.offers).filter((offer) => offer.isChecked).reduce((sum, current) => sum + current.price, 0) : 0;
+  // const totalCostSelectedOffers = allEvents.length > 0 ? allEvents.map((event) => Object.values(event.offers)).filter((offer) => offer.isChecked).reduce((sum, current) => sum + current.price, 0) : 0;
   const totalCoat = totalCostMain + totalCostSelectedOffers;
 
   return (

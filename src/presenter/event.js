@@ -2,12 +2,20 @@ import EventView from "../view/event.js";
 import EventEditView from "../view/event-edit.js";
 import {render, RenderPosition, replaceElement, removeElement} from "../utils/render.js";
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  EDITING: `EDITING`
+};
+
 export default class Event {
-  constructor(eventsList, handleEventChange) {
+  constructor(eventsList, handleEventChange, handleModeChange) {
     this._eventsListContainer = eventsList;
     this._eventComponent = null;
     this._eventEditComponent = null;
+    this._mode = Mode.DEFAULT;
+
     this._handleEventChange = handleEventChange;
+    this._handleModeChange = handleModeChange;
 
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
@@ -33,11 +41,11 @@ export default class Event {
       return;
     }
 
-    if (this._eventsListContainer.element.contains(prevEventComponent.element)) {
+    if (this._mode === Mode.DEFAULT) {
       replaceElement(this._eventComponent, prevEventComponent);
     }
 
-    if (this._eventsListContainer.element.contains(prevEventEditComponent.element)) {
+    if (this._mode === Mode.EDITING) {
       replaceElement(this._eventEditComponent, prevEventEditComponent);
     }
 
@@ -48,16 +56,26 @@ export default class Event {
   _replaceEventToEditForm() {
     replaceElement(this._eventEditComponent, this._eventComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
+    this._handleModeChange();
+    this._mode = Mode.EDITING;
   }
 
   _replaceEditFormToEvent() {
     replaceElement(this._eventComponent, this._eventEditComponent);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._replaceEditFormToEvent();
+    }
   }
 
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
+      this._eventEditComponent.reset(this._event);
       this._replaceEditFormToEvent();
     }
   }

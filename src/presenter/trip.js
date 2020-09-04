@@ -21,8 +21,9 @@ export default class Trip {
     this._sortComponent = new SortView();
     this._noEventsComponent = new NoEventsView();
 
-    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
     this._handleEventChange = this._handleEventChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(events) {
@@ -32,15 +33,16 @@ export default class Trip {
     this._renderTrip();
   }
 
+  _handleModeChange() {
+    Object
+      .values(this._eventsPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
   _handleEventChange(updatedEvent) {
     this._events = updateItem(this._events, updatedEvent);
     this._initialEvents = updateItem(this._initialEvents, updatedEvent);
     this._eventsPresenter[updatedEvent.id].init(updatedEvent);
-  }
-
-  _renderSort() {
-    render(this._tripEventsContainer, this._sortComponent, RenderPosition.BEFORE_END);
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _handleSortTypeChange(sortType) {
@@ -51,6 +53,11 @@ export default class Trip {
     this._sortEvents(sortType);
     this._clearTripDays();
     this._renderTripDays();
+  }
+
+  _renderSort() {
+    render(this._tripEventsContainer, this._sortComponent, RenderPosition.BEFORE_END);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _sortEvents(sortType) {
@@ -70,10 +77,10 @@ export default class Trip {
 
   _clearTripDays() {
     this._tripDaysList.forEach((tripDay) => removeElement(tripDay));
-    // Object
-    //   .values(this._eventsPresenter)
-    //   .forEach((presenter) => presenter.destroy());
-    // this._eventsPresenter = {};
+    Object
+      .values(this._eventsPresenter)
+      .forEach((presenter) => presenter.destroy());
+    this._eventsPresenter = {};
   }
 
   _renderTripDays() {
@@ -116,7 +123,7 @@ export default class Trip {
   }
 
   _renderEvent(eventsList, event) {
-    const eventPresenter = new EventPresenter(eventsList, this._handleEventChange);
+    const eventPresenter = new EventPresenter(eventsList, this._handleEventChange, this._handleModeChange);
     eventPresenter.init(event);
     this._eventsPresenter[event.id] = eventPresenter;
   }

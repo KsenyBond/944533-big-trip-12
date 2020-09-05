@@ -17,7 +17,9 @@ const BLANK_EVENT = {
   startTime: setNeutralTime(),
   endTime: setNeutralTime(),
   price: ``,
-  offers: [],
+  // на случай возвращения к хранению офферов в массиве
+  // offers: [],
+  offers: {},
   isFavorite: false
 };
 
@@ -97,8 +99,9 @@ const createEventEditTemplate = (data = {}) => {
   const start = `${startTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
   const end = `${endTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
   const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
-  const availableOffersTemplate = createAvailableOffersTemplate(offers);
-  // const availableOffersTemplate = createAvailableOffersTemplate(Object.values(offers));
+  // на случай возвращения к хранению офферов в массиве
+  // const availableOffersTemplate = createAvailableOffersTemplate(offers);
+  const availableOffersTemplate = createAvailableOffersTemplate(Object.values(offers));
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
 
   return (
@@ -180,7 +183,7 @@ export default class EventEdit extends SmartView {
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
-    // this._selectOffersHandler = this._selectOffersHandler.bind(this);
+    this._selectOffersHandler = this._selectOffersHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -237,15 +240,16 @@ export default class EventEdit extends SmartView {
     }, true);
   }
 
-  // _selectOffersHandler(evt) {
-  //   evt.preventDefault();
-  //   this.updateData({
-  //     offers: Object.assign(
-  //         {},
-  //         this._data.offers,
-  //         // {[evt.target.dataset.offerType.isChecked]: !this._data.offers[evt.target.dataset.offerType.isChecked]}
-  //     )}, true);
-  // }
+  // не получается корректно обратиться к кликнутому офферу и заменить св-во isChecked на обратное
+  _selectOffersHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      offers: Object.assign(
+          {},
+          this._data.offers,
+          {[evt.target.dataset.offerType.isChecked]: !this._data.offers[evt.target.dataset.offerType.isChecked]}
+      )}, true);
+  }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
@@ -267,11 +271,11 @@ export default class EventEdit extends SmartView {
     this.element
       .querySelector(`.event__input--price`)
       .addEventListener(`input`, this._priceInputHandler);
-    // if (this._data.offers.length) {
-    //   this.element
-    //     .querySelectorAll(`.event__offer-checkbox`)
-    //     .forEach((offer) => offer.addEventListener(`change`, this._selectOffersHandler));
-    // }
+    if (this._data.offers.length) {
+      this.element
+        .querySelectorAll(`.event__offer-checkbox`)
+        .forEach((offer) => offer.addEventListener(`change`, this._selectOffersHandler));
+    }
   }
 
   static parseEventToData(event) {

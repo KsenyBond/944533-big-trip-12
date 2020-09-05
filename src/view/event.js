@@ -44,8 +44,9 @@ const createEventTemplate = (event) => {
   const datetimeStart = generateDatetime(startTime);
   const datetimeEnd = generateDatetime(endTime);
   const durationDHM = generateDurationDHM(duration);
-  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.filter((offer) => offer.isChecked));
-  // const selectedOffersTemplate = createEventSelectedOffersTemplate(Object.values(offers).filter((offer) => offer.isChecked));
+  // на случай возвращения к хранению офферов в массиве
+  // const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.filter((offer) => offer.isChecked));
+  const selectedOffersTemplate = createEventSelectedOffersTemplate(Object.values(offers).filter((offer) => offer.isChecked));
 
   return (
     `<li class="trip-events__item">

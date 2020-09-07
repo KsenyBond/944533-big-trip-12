@@ -95,20 +95,11 @@ const generateOffers = (availableOnly = false) => {
       type: offerType,
       name: offers[offerType],
       price: getRandomInteger(10, 30),
-      isChecked: availableOnly ? false : Boolean(getRandomInteger(0, 1)),
+      isChecked: availableOnly || allOffers.filter((offer) => offer.isChecked).length >= 3 ? false : Boolean(getRandomInteger(0, 1)),
     });
   }
 
-  // на случай возвращения к хранению офферов в массиве
-  // return shuffle(allOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
-  const allAvailableOffers = shuffle(allOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
-  const availableOffers = {};
-
-  for (const availableOffer of allAvailableOffers) {
-    availableOffers[availableOffer.type] = availableOffer;
-  }
-
-  return availableOffers;
+  return shuffle(allOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
 };
 
 const generateEvent = () => {

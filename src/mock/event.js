@@ -1,5 +1,5 @@
 import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes} from "../const.js";
+import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
@@ -95,7 +95,7 @@ const generateOffers = (availableOnly = false) => {
       type: offerType,
       name: offers[offerType],
       price: getRandomInteger(10, 30),
-      isChecked: availableOnly || allOffers.filter((offer) => offer.isChecked).length >= 3 ? false : Boolean(getRandomInteger(0, 1)),
+      isChecked: availableOnly || allOffers.filter((offer) => offer.isChecked).length >= MAX_SELECTED_OFFERS_NUMBER ? false : Boolean(getRandomInteger(0, 1)),
     });
   }
 

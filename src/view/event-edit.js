@@ -2,6 +2,7 @@ import {setNeutralTime} from "../utils/common.js";
 import {generateOffers, generateDestination} from "../mock/event.js";
 import SmartView from "./smart.js";
 import {TRANSFER_TYPES, eventsTypes} from "../const.js";
+import {MAX_SELECTED_OFFERS_NUMBER} from "../const";
 
 const BLANK_EVENT = {
   type: {
@@ -245,7 +246,7 @@ export default class EventEdit extends SmartView {
           {[this._data.offers.findIndex((element) => element.type === evt.target.dataset.offerType)]: Object.assign(
               {},
               this._data.offers[this._data.offers.findIndex((element) => element.type === evt.target.dataset.offerType)],
-              {isChecked: evt.target.checked})}
+              {isChecked: this._data.offers.filter((offer) => offer.isChecked).length >= MAX_SELECTED_OFFERS_NUMBER ? false : evt.target.checked})}
       )
     });
   }

@@ -61,4 +61,14 @@ const replaceElement = (newChild, oldChild) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export {RenderPosition, render, renderTemplate, createElement, replaceElement};
+const removeElement = (component) => {
+  if (!(component instanceof Abstract)) {
+    throw new Error(`Can remove only components`);
+  }
+
+  component.element.remove();
+  component.removeElement();
+};
+
+export {RenderPosition, render, renderTemplate, createElement, replaceElement, removeElement};
+

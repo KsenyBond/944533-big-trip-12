@@ -10,5 +10,6 @@ const SortTypes = {
   TIME: `time`,
   PRICE: `price`
 };
+const eventsTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
-export {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENTS_NUMBER, SortTypes};
+export {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENTS_NUMBER, SortTypes, eventsTypes};

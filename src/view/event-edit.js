@@ -1,5 +1,8 @@
 import {setNeutralTime} from "../utils/common.js";
-import AbstractView from "./abstract.js";
+import {generateOffers, generateDestination} from "../mock/event.js";
+import SmartView from "./smart.js";
+import {TRANSFER_TYPES, eventsTypes} from "../const.js";
+import {MAX_SELECTED_OFFERS_NUMBER} from "../const";
 
 const BLANK_EVENT = {
   type: {
@@ -15,22 +18,26 @@ const BLANK_EVENT = {
   startTime: setNeutralTime(),
   endTime: setNeutralTime(),
   price: ``,
-  offers: []
+  offers: [],
+  isFavorite: false
 };
 
 const createEventTypeItemsTemplate = (typesList, currentType) => {
   return typesList.map((type) =>
     `<div class="event__type-item">
-      <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.toLowerCase()}" ${currentType === type ? `checked` : ``}>
+      <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio"
+      name="event-type" value="${type.toLowerCase()}" data-type="${type}" ${currentType === type ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
     </div>`).join(``);
 };
 
-const createButtonsTemplate = (destination) => {
+const createButtonsTemplate = (destination, isFavorite) => {
+  const isChecked = isFavorite ? `checked` : ``;
+
   return `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
     ${destination ?
     `<button class="event__reset-btn" type="reset">Delete</button>
-     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -47,7 +54,8 @@ const createButtonsTemplate = (destination) => {
 const createAvailableOffersTemplate = (offers) => {
   const availableOffers = offers.map((offer) =>
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.isChecked ? `checked` : ``}>
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1"
+      type="checkbox" name="event-offer-${offer.type}" data-offer-type="${offer.type}" ${offer.isChecked ? `checked` : ``}>
       <label class="event__offer-label" for="event-offer-${offer.type}-1">
         <span class="event__offer-title">${offer.name}</span>
         &plus;
@@ -79,8 +87,8 @@ const createDestinationInfoTemplate = (destination) => {
     </section>` : ``}`;
 };
 
-const createEventEditTemplate = (event = {}) => {
-  const {type, destination, startTime, endTime, price, offers} = event;
+const createEventEditTemplate = (data = {}) => {
+  const {type, destination, startTime, endTime, price, offers, isFavorite} = data;
 
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
@@ -89,7 +97,7 @@ const createEventEditTemplate = (event = {}) => {
   const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
   const start = `${startTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
   const end = `${endTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
-  const buttonsTemplate = createButtonsTemplate(destination.place);
+  const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(offers);
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
 
@@ -162,25 +170,119 @@ const createEventEditTemplate = (event = {}) => {
   );
 };
 
-export default class EventEdit extends AbstractView {
-  constructor(event) {
+export default class EventEdit extends SmartView {
+  constructor(event = BLANK_EVENT) {
     super();
-    this._event = event || BLANK_EVENT;
+    this._data = EventEdit.parseEventToData(event);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
+    this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._selectOffersHandler = this._selectOffersHandler.bind(this);
+
+    this._setInnerHandlers();
   }
 
   get template() {
-    return createEventEditTemplate(this._event);
+    return createEventEditTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFavoriteChangeHandler(this._callback.favoriteChange);
+  }
+
+  reset(event) {
+    this.updateData(
+        EventEdit.parseEventToData(event)
+    );
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(EventEdit.parseDataToEvent(this._data));
+  }
+
+  _favoriteChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteChange();
+  }
+
+  _eventTypeChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      type: {
+        name: evt.target.dataset.type,
+        transfer: eventsTypes.slice(0, TRANSFER_TYPES),
+        activity: eventsTypes.slice(TRANSFER_TYPES),
+      },
+      offers: generateOffers(true)
+    });
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      destination: generateDestination(evt.target.value)
+    });
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      price: evt.target.value
+    }, true);
+  }
+
+  _selectOffersHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      offers: Object.assign(
+          [],
+          this._data.offers,
+          {[this._data.offers.findIndex((element) => element.type === evt.target.dataset.offerType)]: Object.assign(
+              {},
+              this._data.offers[this._data.offers.findIndex((element) => element.type === evt.target.dataset.offerType)],
+              {isChecked: this._data.offers.filter((offer) => offer.isChecked).length >= MAX_SELECTED_OFFERS_NUMBER ? false : evt.target.checked})}
+      )
+    });
   }
 
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.element.addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setFavoriteChangeHandler(callback) {
+    this._callback.favoriteChange = callback;
+    this.element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, this._favoriteChangeHandler);
+  }
+
+  _setInnerHandlers() {
+    this.element
+      .querySelector(`.event__type-list`)
+      .addEventListener(`change`, this._eventTypeChangeHandler);
+    this.element
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`change`, this._destinationChangeHandler);
+    this.element
+      .querySelector(`.event__input--price`)
+      .addEventListener(`input`, this._priceInputHandler);
+    if (this._data.offers.length) {
+      this.element
+        .querySelectorAll(`.event__offer-checkbox`)
+        .forEach((offer) => offer.addEventListener(`change`, this._selectOffersHandler));
+    }
+  }
+
+  static parseEventToData(event) {
+    return Object.assign({}, event);
+  }
+
+  static parseDataToEvent(data) {
+    return Object.assign({}, data);
   }
 }

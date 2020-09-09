@@ -74,10 +74,6 @@ const generateEndTime = (start) => {
   return new Date(start.getTime() + minutesGap);
 };
 
-const generateDuration = (start, end) => {
-  return end.getTime() - start.getTime();
-};
-
 const generateOffers = (availableOnly = false) => {
   const offers = {
     luggage: `Add luggage`,
@@ -108,7 +104,6 @@ const generateEvent = () => {
   const destination = generateDestination();
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);
-  const duration = generateDuration(startTime, endTime);
   const price = getRandomInteger(10, 250);
   const offers = generateOffers();
 
@@ -118,7 +113,6 @@ const generateEvent = () => {
     destination,
     startTime,
     endTime,
-    duration,
     price,
     offers,
     isFavorite: Boolean(getRandomInteger(0, 1))

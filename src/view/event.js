@@ -1,23 +1,6 @@
-import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
 import AbstractView from "./abstract.js";
-
-const generateDatetime = (time) => {
-  time = time.toLocaleString(`en-GB`);
-
-  return `${time.slice(0, 10).split(`/`).reverse().join(`-`)}T${time.slice(12, 17)}`;
-};
-
-const generateDurationDHM = (milliseconds) => {
-  let days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
-  let hours = Math.floor((milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  let minutes = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-
-  days = days !== 0 ? `${days}D` : ``;
-  hours = hours !== 0 ? `${hours}H` : ``;
-  minutes = minutes !== 0 ? `${minutes}M` : ``;
-
-  return `${days} ${hours} ${minutes}`.trim();
-};
+import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
+import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
 
 const createEventSelectedOffersTemplate = (offers) => {
   offers = offers.length > 3 ? offers.slice(0, MAX_SELECTED_OFFERS_NUMBER) : offers;
@@ -34,16 +17,16 @@ const createEventSelectedOffersTemplate = (offers) => {
 };
 
 const createEventTemplate = (event) => {
-  const {type, destination, startTime, endTime, duration, price, offers} = event;
+  const {type, destination, startTime, endTime, price, offers} = event;
 
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
   const iconType = typeName.toLowerCase();
-  const start = startTime.toLocaleTimeString(`en-GB`).slice(0, -3);
-  const end = endTime.toLocaleTimeString(`en-GB`).slice(0, -3);
-  const datetimeStart = generateDatetime(startTime);
-  const datetimeEnd = generateDatetime(endTime);
-  const durationDHM = generateDurationDHM(duration);
+  const start = transformToTime(startTime);
+  const end = transformToTime(endTime);
+  const datetimeStart = `${transformToDatetimeAttr(startTime)}T${start}`;
+  const datetimeEnd = `${transformToDatetimeAttr(endTime)}T${end}`;
+  const durationDHM = generateDurationDHM(event.endTime - event.startTime);
   const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.filter((offer) => offer.isChecked));
 
   return (

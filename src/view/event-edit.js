@@ -1,8 +1,10 @@
-import {setNeutralTime} from "../utils/common.js";
-import {generateOffers, generateDestination} from "../mock/event.js";
+import flatpickr from "flatpickr";
 import SmartView from "./smart.js";
-import {TRANSFER_TYPES, eventsTypes} from "../const.js";
-import {MAX_SELECTED_OFFERS_NUMBER} from "../const";
+import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
+import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, eventsTypes} from "../const.js";
+import {generateOffers, generateDestination} from "../mock/event.js";
+
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const BLANK_EVENT = {
   type: {
@@ -20,6 +22,12 @@ const BLANK_EVENT = {
   price: ``,
   offers: [],
   isFavorite: false
+};
+
+const FLATPICKR_OPTIONS = {
+  'dateFormat': `d/m/Y H:i`,
+  'enableTime': true,
+  'time_24hr': true,
 };
 
 const createEventTypeItemsTemplate = (typesList, currentType) => {
@@ -95,8 +103,8 @@ const createEventEditTemplate = (data = {}) => {
   const iconType = typeName.toLowerCase();
   const transferTypesTemplate = createEventTypeItemsTemplate(type.transfer, type.name);
   const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
-  const start = `${startTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${startTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
-  const end = `${endTime.toLocaleDateString(`en-GB`, {day: `2-digit`, month: `2-digit`, year: `2-digit`})} ${endTime.toLocaleTimeString(`en-GB`, {hour: `2-digit`, minute: `2-digit`})}`;
+  const start = transformToDateAndTime(startTime);
+  const end = transformToDateAndTime(endTime);
   const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(offers);
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
@@ -174,6 +182,8 @@ export default class EventEdit extends SmartView {
   constructor(event = BLANK_EVENT) {
     super();
     this._data = EventEdit.parseEventToData(event);
+    this._startDatepicker = null;
+    this._endDatepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
@@ -181,8 +191,11 @@ export default class EventEdit extends SmartView {
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
     this._selectOffersHandler = this._selectOffersHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._endDateChangeHandler = this._endDateChangeHandler.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   get template() {
@@ -191,6 +204,7 @@ export default class EventEdit extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFavoriteChangeHandler(this._callback.favoriteChange);
   }
@@ -251,6 +265,21 @@ export default class EventEdit extends SmartView {
     });
   }
 
+  _startDateChangeHandler(selectedDates) {
+    const endTime = selectedDates[0] > this._data.endTime ? selectedDates[0] : this._data.endTime;
+
+    this.updateData({
+      startTime: selectedDates[0],
+      endTime
+    });
+  }
+
+  _endDateChangeHandler(selectedDates) {
+    this.updateData({
+      endTime: selectedDates[0]
+    });
+  }
+
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.element.addEventListener(`submit`, this._formSubmitHandler);
@@ -276,6 +305,41 @@ export default class EventEdit extends SmartView {
         .querySelectorAll(`.event__offer-checkbox`)
         .forEach((offer) => offer.addEventListener(`change`, this._selectOffersHandler));
     }
+  }
+
+  _setDatepickers() {
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
+
+    this._startDatepicker = flatpickr(
+        this.element.querySelector(`#event-start-time-1`),
+        Object.assign(
+            {
+              defaultDate: this._data.startTime,
+              onChange: this._startDateChangeHandler
+            },
+            FLATPICKR_OPTIONS
+        )
+    );
+
+    this._endDatepicker = flatpickr(
+        this.element.querySelector(`#event-end-time-1`),
+        Object.assign(
+            {
+              minDate: this._data.startTime,
+              defaultDate: this._data.endTime,
+              onChange: this._endDateChangeHandler
+            },
+            FLATPICKR_OPTIONS
+        )
+    );
   }
 
   static parseEventToData(event) {

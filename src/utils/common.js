@@ -72,7 +72,11 @@ const transformToLocaleDate = (event) => {
 };
 
 const sortTimeDown = (eventA, eventB) => {
-  return eventB.duration - eventA.duration;
+  const getDuration = (event) => {
+    return event.endTime - event.startTime;
+  };
+
+  return getDuration(eventB) - getDuration(eventA);
 };
 
 const sortPriceDown = (taskA, taskB) => {

@@ -186,6 +186,7 @@ export default class EventEdit extends SmartView {
     this._endDatepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
@@ -206,6 +207,7 @@ export default class EventEdit extends SmartView {
     this._setInnerHandlers();
     this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setFavoriteChangeHandler(this._callback.favoriteChange);
   }
 
@@ -215,9 +217,23 @@ export default class EventEdit extends SmartView {
     );
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+  }
+
   _formSubmitHandler(evt) {
     evt.preventDefault();
     this._callback.formSubmit(EventEdit.parseDataToEvent(this._data));
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(EventEdit.parseDataToEvent(this._data));
   }
 
   _favoriteChangeHandler(evt) {
@@ -283,6 +299,11 @@ export default class EventEdit extends SmartView {
   setFormSubmitHandler(callback) {
     this._callback.formSubmit = callback;
     this.element.addEventListener(`submit`, this._formSubmitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.element.addEventListener(`reset`, this._formDeleteClickHandler);
   }
 
   setFavoriteChangeHandler(callback) {

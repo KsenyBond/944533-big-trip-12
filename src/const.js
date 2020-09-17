@@ -12,4 +12,16 @@ const SortTypes = {
 };
 const eventsTypes = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
 
-export {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENTS_NUMBER, SortTypes, eventsTypes};
+const UserAction = {
+  UPDATE_EVENT: `UPDATE_EVENT`,
+  ADD_EVENT: `ADD_EVENT`,
+  DELETE_EVENT: `DELETE_EVENT`
+};
+
+const UpdateType = {
+  MINOR: `MINOR`,
+  MAJOR: `MAJOR`
+};
+
+export {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER,
+  DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENTS_NUMBER, SortTypes, eventsTypes, UserAction, UpdateType};

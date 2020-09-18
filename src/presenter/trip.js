@@ -7,13 +7,15 @@ import NoEventsView from "../view/no-events.js";
 import EventPresenter from "./event.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
 import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
-import {SortTypes, UserAction, UpdateType} from "../const.js";
+import {filter} from "../utils/filter.js";
+import {SortTypes, UserAction, UpdateType, FilterType} from "../const.js";
 
 
 export default class Trip {
-  constructor(tripEventsContainer, eventsModel) {
+  constructor(tripEventsContainer, eventsModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
+    this._filterModel = filterModel;
     this._currentSortType = SortTypes.EVENT;
     this._eventsPresenter = {};
     this._tripDaysList = [];
@@ -28,6 +30,7 @@ export default class Trip {
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -35,14 +38,22 @@ export default class Trip {
   }
 
   _getEvents() {
-    switch (this._currentSortType) {
-      case SortTypes.TIME:
-        return this._eventsModel.events.slice().sort(sortTimeDown);
-      case SortTypes.PRICE:
-        return this._eventsModel.events.slice().sort(sortPriceDown);
+    const filterType = this._filterModel.filter;
+    const events = this._eventsModel.events;
+    const filtredEvents = filter[filterType](events);
+
+    if (filterType !== FilterType.EVERYTHING) {
+      this._currentSortType = SortTypes.EVENT;
     }
 
-    return this._eventsModel.events;
+    switch (this._currentSortType) {
+      case SortTypes.TIME:
+        return filtredEvents.sort(sortTimeDown);
+      case SortTypes.PRICE:
+        return filtredEvents.sort(sortPriceDown);
+    }
+
+    return filtredEvents;
   }
 
   _handleModeChange() {
@@ -95,7 +106,7 @@ export default class Trip {
     this._sortComponent = new SortView(this._currentSortType);
 
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-    render(this._tripEventsContainer, this._sortComponent, RenderPosition.BEFORE_END);
+    render(this._tripEventsContainer, this._sortComponent, RenderPosition.AFTER_BEGIN);
   }
 
   _clearTrip() {

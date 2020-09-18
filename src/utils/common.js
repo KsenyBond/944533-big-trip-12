@@ -83,6 +83,26 @@ const sortPriceDown = (taskA, taskB) => {
   return taskB.price - taskA.price;
 };
 
+const isDatesEqual = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return true;
+  }
+
+  return moment(dateA).isSame(dateB, `day`);
+};
+
+const isEventPast = (endTime) => {
+  const currentDate = new Date();
+
+  return endTime.getTime() < currentDate.getTime();
+};
+
+const isEventFuture = (startTime) => {
+  const currentDate = new Date();
+
+  return startTime.getTime() > currentDate.getTime();
+};
+
 export {getRandomInteger, generateValue, shuffle, setNeutralTime, transformToDateAndTime, transformToDatetime,
   transformToTime, transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
-  sortTimeDown, sortPriceDown};
+  sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture};

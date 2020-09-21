@@ -5,11 +5,11 @@ import TripDayCounterView from "../view/day-counter.js";
 import TripEventsListView from "../view/trip-events-list.js";
 import NoEventsView from "../view/no-events.js";
 import EventPresenter from "./event.js";
+import EventNewPresenter from "./event-new.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
 import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
 import {filter} from "../utils/filter.js";
 import {SortTypes, UserAction, UpdateType, FilterType} from "../const.js";
-
 
 export default class Trip {
   constructor(tripEventsContainer, eventsModel, filterModel) {
@@ -31,20 +31,24 @@ export default class Trip {
 
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents());
   }
 
   init() {
     this._renderTrip();
   }
 
+  createEvent(newEventButtonElement) {
+    this._currentSortType = SortTypes.EVENT;
+    this._filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._eventNewPresenter.init(newEventButtonElement, this._tripDaysComponent);
+  }
+
   _getEvents() {
     const filterType = this._filterModel.filter;
     const events = this._eventsModel.events;
     const filtredEvents = filter[filterType](events);
-
-    if (filterType !== FilterType.EVERYTHING) {
-      this._currentSortType = SortTypes.EVENT;
-    }
 
     switch (this._currentSortType) {
       case SortTypes.TIME:
@@ -57,6 +61,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventsPresenter)
       .forEach((presenter) => presenter.resetView());
@@ -82,6 +87,10 @@ export default class Trip {
         this._eventsPresenter[update.id].init(update);
         break;
       case UpdateType.MAJOR:
+        if (update && typeof update === `boolean`) {
+          this._currentSortType = SortTypes.EVENT;
+        }
+
         this._clearTrip();
         this._renderTrip();
         break;
@@ -111,6 +120,7 @@ export default class Trip {
 
   _clearTrip() {
     this._tripDaysList.forEach((tripDay) => removeElement(tripDay));
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventsPresenter)
       .forEach((presenter) => presenter.destroy());
@@ -127,7 +137,6 @@ export default class Trip {
 
   _renderTripDay() {
     const eventsDates = this._getEvents()
-      .sort((event1, event2) => event1.startTime.getTime() - event2.startTime.getTime())
       .map((event) => transformToLocaleDate(event));
     let eventsUniqueDates = Array.from(new Set(eventsDates));
     if (this._currentSortType !== SortTypes.EVENT) {

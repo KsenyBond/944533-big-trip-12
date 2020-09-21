@@ -30,3 +30,11 @@ const filterPresenter = new FilterPresenter(siteHeaderControlsElement, filterMod
 
 filterPresenter.init();
 tripPresenter.init();
+
+const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+
+newEventButtonElement.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  newEventButtonElement.setAttribute(`disabled`, `disabled`);
+  tripPresenter.createEvent(newEventButtonElement);
+});

@@ -1,3 +1,4 @@
+import he from 'he';
 import AbstractView from "./abstract.js";
 import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
 import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
@@ -47,7 +48,7 @@ const createEventTemplate = (event) => {
         </div>
 
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${he.encode(price.toString())}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>

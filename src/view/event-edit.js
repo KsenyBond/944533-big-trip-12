@@ -1,14 +1,15 @@
 import flatpickr from "flatpickr";
+import he from 'he';
 import SmartView from "./smart.js";
 import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
-import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, eventsTypes} from "../const.js";
+import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, eventsTypes, destinations} from "../const.js";
 import {generateOffers, generateDestination} from "../mock/event.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const BLANK_EVENT = {
   type: {
-    name: `Bus`,
+    name: `Flight`,
     transfer: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
     activity: [`Check-in`, `Sightseeing`, `Restaurant`],
   },
@@ -81,6 +82,10 @@ const createAvailableOffersTemplate = (offers) => {
     </section>` : ``}`;
 };
 
+const createDestinationTemplate = (possibleDestinations) => {
+  return possibleDestinations.map((destination) => `<option value="${destination}"></option>`).join(`\n`);
+};
+
 const createDestinationInfoTemplate = (destination) => {
   return `${destination.description ?
     `<section class="event__section  event__section--destination">
@@ -107,6 +112,7 @@ const createEventEditTemplate = (data = {}) => {
   const end = transformToDateAndTime(endTime);
   const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(offers);
+  const destinationTemplate = createDestinationTemplate(destinations);
   const destinationInfoTemplate = createDestinationInfoTemplate(destination);
 
   return (
@@ -139,10 +145,7 @@ const createEventEditTemplate = (data = {}) => {
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
           name="event-destination" value="${destination.place}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
-            <option value="Saint Petersburg"></option>
+            ${destinationTemplate}
           </datalist>
         </div>
 
@@ -165,7 +168,7 @@ const createEventEditTemplate = (data = {}) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}">
         </div>
         ${buttonsTemplate}
       </header>
@@ -307,8 +310,12 @@ export default class EventEdit extends SmartView {
   }
 
   setFavoriteChangeHandler(callback) {
+    const eventFavoriteButton = this.element.querySelector(`.event__favorite-checkbox`);
     this._callback.favoriteChange = callback;
-    this.element.querySelector(`.event__favorite-checkbox`).addEventListener(`change`, this._favoriteChangeHandler);
+
+    if (eventFavoriteButton) {
+      eventFavoriteButton.addEventListener(`change`, this._favoriteChangeHandler);
+    }
   }
 
   _setInnerHandlers() {

@@ -1,5 +1,6 @@
 import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes} from "../const.js";
+import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER,
+  DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes, destinations, destinationRandomDescriptions,} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
@@ -12,25 +13,6 @@ const generateType = () => {
 };
 
 const generateDestination = (selectedPlace) => {
-  const destinations = [
-    `Rome`,
-    `Florence`,
-    `Bergamo`,
-    `Venice`
-  ];
-  const destinationRandomDescriptions = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
-
   const generateRandomDescription = () => {
     return destinationRandomDescriptions[getRandomInteger(0, destinationRandomDescriptions.length - 1)];
   };
@@ -119,4 +101,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateEvent, generateOffers, generateDestination};
+export {generateId, generateEvent, generateOffers, generateDestination};

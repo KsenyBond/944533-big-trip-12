@@ -8,8 +8,9 @@ export default class Filter extends Observer {
   }
 
   changeFilter(updateType, filter) {
+    const filterHasChanged = this._activeFilter !== filter;
     this._activeFilter = filter;
-    this._notify(updateType, filter);
+    this._notify(updateType, filterHasChanged);
   }
 
   get filter() {

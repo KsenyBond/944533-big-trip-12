@@ -12,9 +12,10 @@ const Mode = {
 export default class Event {
   constructor(eventsList, handleEventChange, handleModeChange) {
     this._eventsListContainer = eventsList;
+    this._mode = Mode.DEFAULT;
+
     this._eventComponent = null;
     this._eventEditComponent = null;
-    this._mode = Mode.DEFAULT;
 
     this._handleEventChange = handleEventChange;
     this._handleModeChange = handleModeChange;

@@ -1,6 +1,6 @@
 import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
 import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER,
-  DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes, destinations, destinationRandomDescriptions,} from "../const.js";
+  DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes, destinations, destinationRandomDescriptions} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 

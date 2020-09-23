@@ -5,82 +5,132 @@ import TripDayCounterView from "../view/day-counter.js";
 import TripEventsListView from "../view/trip-events-list.js";
 import NoEventsView from "../view/no-events.js";
 import EventPresenter from "./event.js";
+import EventNewPresenter from "./event-new.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
-import {sortTimeDown, sortPriceDown, transformToLocaleDate, updateItem} from "../utils/common.js";
-import {SortTypes} from "../const.js";
-
+import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
+import {filter} from "../utils/filter.js";
+import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
 
 export default class Trip {
-  constructor(tripEventsContainer) {
+  constructor(tripEventsContainer, eventsModel, destinations, offersModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
-    this._currentSortType = SortTypes.EVENT;
+    this._eventsModel = eventsModel;
+    this._offersModel = offersModel;
+    this._filterModel = filterModel;
+    this._destinations = destinations;
+    this._currentSortType = SortType.EVENT;
     this._eventsPresenter = {};
     this._tripDaysList = [];
 
+    this._sortComponent = null;
+
     this._tripDaysComponent = new TripDaysView();
-    this._sortComponent = new SortView();
     this._noEventsComponent = new NoEventsView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
-    this._handleEventChange = this._handleEventChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+
+    this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
+    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents(), this._destinations, this._offersModel);
   }
 
-  init(events) {
-    this._events = events.slice();
-    this._initialEvents = this._events.slice();
-
+  init() {
     this._renderTrip();
   }
 
+  createEvent(newEventButtonElement) {
+    this._currentSortType = SortType.EVENT;
+    this._filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._eventNewPresenter.init(newEventButtonElement, this._tripDaysComponent);
+  }
+
+  _getEvents() {
+    const filterType = this._filterModel.filter;
+    const events = this._eventsModel.events;
+    const filteredEvents = filter[filterType](events);
+
+    switch (this._currentSortType) {
+      case SortType.TIME:
+        return filteredEvents.sort(sortTimeDown);
+      case SortType.PRICE:
+        return filteredEvents.sort(sortPriceDown);
+    }
+
+    return filteredEvents;
+  }
+
   _handleModeChange() {
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventsPresenter)
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handleEventChange(updatedEvent) {
-    this._events = updateItem(this._events, updatedEvent);
-    this._initialEvents = updateItem(this._initialEvents, updatedEvent);
-    this._eventsPresenter[updatedEvent.id].init(updatedEvent);
+  _handleViewAction(actionType, updateType, update) {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this._eventsModel.updateEvent(updateType, update);
+        break;
+      case UserAction.ADD_EVENT:
+        this._eventsModel.addEvent(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this._eventsModel.deleteEvent(updateType, update);
+        break;
+    }
+  }
+
+  _handleModelEvent(updateType, update) {
+    switch (updateType) {
+      case UpdateType.MINOR:
+        this._eventsPresenter[update.id].init(update);
+        break;
+      case UpdateType.MAJOR:
+        if (update && typeof update === `boolean`) {
+          this._currentSortType = SortType.EVENT;
+        }
+
+        this._clearTrip();
+        this._renderTrip();
+        break;
+    }
   }
 
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
+    this._currentSortType = sortType;
 
-    this._sortEvents(sortType);
-    this._clearTripDays();
-    this._renderTripDays();
+    this._clearTrip();
+    this._renderTrip();
   }
 
   _renderSort() {
-    render(this._tripEventsContainer, this._sortComponent, RenderPosition.BEFORE_END);
-    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-  }
-
-  _sortEvents(sortType) {
-    switch (sortType) {
-      case SortTypes.TIME:
-        this._events.sort(sortTimeDown);
-        break;
-      case SortTypes.PRICE:
-        this._events.sort(sortPriceDown);
-        break;
-      default:
-        this._events = this._initialEvents.slice();
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
     }
 
-    this._currentSortType = sortType;
+    this._sortComponent = new SortView(this._currentSortType);
+
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._tripEventsContainer, this._sortComponent, RenderPosition.AFTER_BEGIN);
   }
 
-  _clearTripDays() {
+  _clearTrip() {
     this._tripDaysList.forEach((tripDay) => removeElement(tripDay));
+    this._eventNewPresenter.destroy();
     Object
       .values(this._eventsPresenter)
       .forEach((presenter) => presenter.destroy());
     this._eventsPresenter = {};
+
+    removeElement(this._sortComponent);
+    removeElement(this._noEventsComponent);
   }
 
   _renderTripDays() {
@@ -89,10 +139,10 @@ export default class Trip {
   }
 
   _renderTripDay() {
-    const [...tripEvents] = this._events;
-    const eventsDates = tripEvents.map((event) => transformToLocaleDate(event));
+    const eventsDates = this._getEvents()
+      .map((event) => transformToLocaleDate(event));
     let eventsUniqueDates = Array.from(new Set(eventsDates));
-    if (this._currentSortType !== SortTypes.EVENT) {
+    if (this._currentSortType !== SortType.EVENT) {
       eventsUniqueDates = [``];
     }
 
@@ -113,9 +163,9 @@ export default class Trip {
   _renderEventsList(uniqueDate) {
     this._eventsListComponent = new TripEventsListView();
     render(this._tripDayComponent, this._eventsListComponent, RenderPosition.BEFORE_END);
-    let uniqueDateEvents = this._events.filter((event) => transformToLocaleDate(event) === uniqueDate);
-    if (this._currentSortType !== SortTypes.EVENT) {
-      uniqueDateEvents = this._events;
+    let uniqueDateEvents = this._getEvents().filter((event) => transformToLocaleDate(event) === uniqueDate);
+    if (this._currentSortType !== SortType.EVENT) {
+      uniqueDateEvents = this._getEvents();
     }
     uniqueDateEvents.forEach((uniqueDateEvent) => {
       this._renderEvent(this._eventsListComponent, uniqueDateEvent);
@@ -123,7 +173,7 @@ export default class Trip {
   }
 
   _renderEvent(eventsList, event) {
-    const eventPresenter = new EventPresenter(eventsList, this._handleEventChange, this._handleModeChange);
+    const eventPresenter = new EventPresenter(eventsList, this._handleViewAction, this._handleModeChange, this._destinations, this._offersModel);
     eventPresenter.init(event);
     this._eventsPresenter[event.id] = eventPresenter;
   }
@@ -133,7 +183,7 @@ export default class Trip {
   }
 
   _renderTrip() {
-    if (!this._events.length) {
+    if (!this._getEvents().length) {
       this._renderNoEvents();
       return;
     }

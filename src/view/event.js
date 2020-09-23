@@ -1,19 +1,17 @@
+import he from 'he';
 import AbstractView from "./abstract.js";
-import {MAX_SELECTED_OFFERS_NUMBER} from "../const.js";
 import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
 
 const createEventSelectedOffersTemplate = (offers) => {
-  offers = offers.length > 3 ? offers.slice(0, MAX_SELECTED_OFFERS_NUMBER) : offers;
-
-  const selectedOffers = offers.map((offer) =>
-    `<li class="event__offer">
-      <span class="event__offer-title">${offer.name}</span>
-      &plus;
-      &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-    </li>`);
-  const selectedUniqueOffers = new Set(selectedOffers);
-
-  return Array.from(selectedUniqueOffers).join(``);
+  return offers.map((offer) => {
+    return (
+      `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+      </li>`
+    );
+  }).join(``);
 };
 
 const createEventTemplate = (event) => {
@@ -27,7 +25,7 @@ const createEventTemplate = (event) => {
   const datetimeStart = `${transformToDatetimeAttr(startTime)}T${start}`;
   const datetimeEnd = `${transformToDatetimeAttr(endTime)}T${end}`;
   const durationDHM = generateDurationDHM(event.endTime - event.startTime);
-  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.filter((offer) => offer.isChecked));
+  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers);
 
   return (
     `<li class="trip-events__item">
@@ -47,7 +45,7 @@ const createEventTemplate = (event) => {
         </div>
 
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${price}</span>
+          &euro;&nbsp;<span class="event__price-value">${he.encode(price.toString())}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>

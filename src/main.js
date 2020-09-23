@@ -1,15 +1,26 @@
 import TripMainInfoView from "./view/trip-main-info.js";
 import TripTabsView from "./view/trip-tabs.js";
-import TripFiltersView from "./view/trip-filters.js";
-import {generateEvent} from "./mock/event.js";
+import TripPresenter from "./presenter/trip.js";
+import FilterPresenter from "./presenter/filter.js";
+import EventsModel from "./model/events.js";
+import FilterModel from "./model/filter.js";
+import OffersModel from "./model/offers.js";
+import {generateEvent, destinations} from "./mock/event.js";
+import {availableOffers} from "./mock/offer.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {EVENTS_NUMBER} from "./const.js";
-import TripPresenter from "./presenter/trip.js";
 
 const events = new Array(EVENTS_NUMBER)
   .fill()
-  .map(generateEvent)
-  .sort((event1, event2) => event1.startTime.getTime() - event2.startTime.getTime());
+  .map(generateEvent);
+
+const eventsModel = new EventsModel();
+eventsModel.events = events;
+
+const offersModel = new OffersModel();
+offersModel.offers = availableOffers;
+
+const filterModel = new FilterModel();
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
 const siteHeaderControlsElement = siteHeaderMainElement.querySelector(`.trip-main__trip-controls`);
@@ -18,7 +29,19 @@ const siteItineraryElement = document.querySelector(`.trip-events`);
 
 render(siteHeaderMainElement, new TripMainInfoView(events), RenderPosition.AFTER_BEGIN);
 render(siteHeaderControlsElement, new TripTabsView(), RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
-render(siteHeaderControlsElement, new TripFiltersView(), RenderPosition.BEFORE_END);
 
-const tripPresenter = new TripPresenter(siteItineraryElement);
-tripPresenter.init(events);
+const tripPresenter = new TripPresenter(siteItineraryElement, eventsModel, destinations, offersModel, filterModel);
+const filterPresenter = new FilterPresenter(siteHeaderControlsElement, filterModel, eventsModel);
+
+filterPresenter.init();
+tripPresenter.init();
+
+const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+
+const newEventButtonClickHandler = (evt) => {
+  evt.preventDefault();
+  newEventButtonElement.setAttribute(`disabled`, `disabled`);
+  tripPresenter.createEvent(newEventButtonElement);
+};
+
+newEventButtonElement.addEventListener(`click`, newEventButtonClickHandler);

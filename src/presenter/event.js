@@ -1,6 +1,8 @@
 import EventView from "../view/event.js";
 import EventEditView from "../view/event-edit.js";
 import {render, RenderPosition, replaceElement, removeElement} from "../utils/render.js";
+import {isDatesEqual} from "../utils/common.js";
+import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -8,19 +10,22 @@ const Mode = {
 };
 
 export default class Event {
-  constructor(eventsList, handleEventChange, handleModeChange) {
+  constructor(eventsList, handleEventChange, handleModeChange, destinations, offersModel) {
     this._eventsListContainer = eventsList;
-    this._eventComponent = null;
-    this._eventEditComponent = null;
-    this._mode = Mode.DEFAULT;
-
     this._handleEventChange = handleEventChange;
     this._handleModeChange = handleModeChange;
+    this._destinations = destinations;
+    this._offersModel = offersModel;
+    this._mode = Mode.DEFAULT;
+
+    this._eventComponent = null;
+    this._eventEditComponent = null;
 
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
+    this._deleteClickHandler = this._deleteClickHandler.bind(this);
   }
 
   init(event) {
@@ -30,10 +35,11 @@ export default class Event {
     const prevEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventView(this._event);
-    this._eventEditComponent = new EventEditView(this._event);
+    this._eventEditComponent = new EventEditView(this._destinations, this._offersModel, this._event);
 
     this._eventComponent.setRollupClickHandler(this._rollupClickHandler);
     this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
+    this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);
     this._eventEditComponent.setFavoriteChangeHandler(this._favoriteChangeHandler);
 
     if (prevEventComponent === null || prevEventEditComponent === null) {
@@ -85,12 +91,30 @@ export default class Event {
   }
 
   _formSubmitHandler(event) {
-    this._handleEventChange(event);
+    const isMinorUpdate = isDatesEqual(this._event.startTime, event.startTime)
+      && isDatesEqual(this._event.endTime, event.endTime)
+      && this._event.price === event.price;
+
+    this._handleEventChange(
+        UserAction.UPDATE_EVENT,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.MAJOR,
+        event
+    );
     this._replaceEditFormToEvent();
+  }
+
+  _deleteClickHandler(event) {
+    this._handleEventChange(
+        UserAction.DELETE_EVENT,
+        UpdateType.MAJOR,
+        event
+    );
   }
 
   _favoriteChangeHandler() {
     this._handleEventChange(
+        UserAction.UPDATE_EVENT,
+        UpdateType.MINOR,
         Object.assign(
             {},
             this._event,

@@ -1,6 +1,6 @@
 import AbstractView from "./abstract.js";
 import {transformToDatetime, transformToMonthDay} from "../utils/common.js";
-import {SortTypes} from "../const.js";
+import {SortType} from "../const.js";
 
 const createTripDayCounterTemplate = (uniqueDate, index, sortType) => {
   const datetime = transformToDatetime(uniqueDate);
@@ -8,7 +8,7 @@ const createTripDayCounterTemplate = (uniqueDate, index, sortType) => {
 
   return (
     `<div class="day__info">
-      ${sortType === SortTypes.EVENT ?
+      ${sortType === SortType.EVENT ?
       `<span class="day__counter">${index + 1}</span>
       <time class="day__date" datetime="${datetime}">
         ${monthDay}

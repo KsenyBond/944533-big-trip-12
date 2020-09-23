@@ -1,56 +1,43 @@
-import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes} from "../const.js";
+import {availableOffers} from "./offer.js";
+import {getRandomInteger, generateValue} from "../utils/common.js";
+import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER,
+  DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateType = () => {
   return {
-    name: generateValue(eventsTypes),
-    transfer: eventsTypes.slice(0, TRANSFER_TYPES),
-    activity: eventsTypes.slice(TRANSFER_TYPES),
+    name: generateValue(EVENT_TYPES),
+    transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
+    activity: EVENT_TYPES.slice(TRANSFER_TYPES),
   };
 };
 
-const generateDestination = (selectedPlace) => {
-  const destinations = [
-    `Rome`,
-    `Florence`,
-    `Bergamo`,
-    `Venice`
-  ];
-  const destinationRandomDescriptions = [
-    `Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
-    `Cras aliquet varius magna, non porta ligula feugiat eget.`,
-    `Fusce tristique felis at fermentum pharetra.`,
-    `Aliquam id orci ut lectus varius viverra.`,
-    `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`,
-    `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`,
-    `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
-    `Sed sed nisi sed augue convallis suscipit in sed felis.`,
-    `Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus.`
-  ];
+const destinations = new Map();
 
-  const generateRandomDescription = () => {
-    return destinationRandomDescriptions[getRandomInteger(0, destinationRandomDescriptions.length - 1)];
+const generateRandomDescription = () => {
+  const getRandomDescription = () => {
+    return DESTINATION_DESCRIPTION[getRandomInteger(0, DESTINATION_DESCRIPTION.length - 1)];
   };
-
-  const generateRandomPhotos = () => {
-    return `http://picsum.photos/248/152?r=${Math.random()}`;
-  };
-
   const destinationDescription =
-    new Array(getRandomInteger(1, 5))
-      .fill()
-      .map(generateRandomDescription);
+      new Array(getRandomInteger(1, 5))
+          .fill()
+          .map(getRandomDescription);
   const uniqueDestinationDescription = new Set(destinationDescription);
 
-  return {
-    place: selectedPlace || generateValue(destinations),
-    description: Array.from(uniqueDestinationDescription).join(` `),
-    photos: new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos),
-  };
+  return Array.from(uniqueDestinationDescription).join(` `);
 };
+
+const generateRandomPhotos = () => {
+  return `http://picsum.photos/248/152?r=${Math.random()}`;
+};
+
+EVENT_DESTINATIONS.forEach((place) => {
+  const description = generateRandomDescription();
+  const photos = new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos);
+
+  destinations.set(place, {place, description, photos});
+});
 
 const generateStartTime = () => {
   const daysGap = getRandomInteger(-MAX_DAYS_GAP, MAX_DAYS_GAP);
@@ -74,38 +61,30 @@ const generateEndTime = (start) => {
   return new Date(start.getTime() + minutesGap);
 };
 
-const generateOffers = (availableOnly = false) => {
-  const offers = {
-    luggage: `Add luggage`,
-    meal: `Add meal`,
-    comfort: `Switch to comfort`,
-    seats: `Choose seats`,
-    train: `Travel by train`,
-    tickets: `Book tickets`,
-    lunch: `Lunch in city`,
-  };
-  const allOffers = [];
+const generateOffers = (type, offersList) => {
+  const typeMatchingOffers = offersList.find((element) => element.type === type.name).offers;
 
-  for (const offerType of Object.keys(offers)) {
-    allOffers.push({
-      type: offerType,
-      name: offers[offerType],
-      price: getRandomInteger(10, 30),
-      isChecked: availableOnly || allOffers.filter((offer) => offer.isChecked).length >= MAX_SELECTED_OFFERS_NUMBER ? false : Boolean(getRandomInteger(0, 1)),
-    });
+  const selectedOffers = [];
+
+  for (const offer of typeMatchingOffers) {
+    if (selectedOffers.length < MAX_SELECTED_OFFERS_NUMBER) {
+      if (getRandomInteger(0, 1)) {
+        selectedOffers.push(offer);
+      }
+    }
   }
 
-  return shuffle(allOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
+  return selectedOffers;
 };
 
 const generateEvent = () => {
   const id = generateId();
   const type = generateType();
-  const destination = generateDestination();
+  const destination = generateValue(Array.from(destinations.values()));
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);
   const price = getRandomInteger(10, 250);
-  const offers = generateOffers();
+  const offers = generateOffers(type, Array.from(availableOffers.values()));
 
   return {
     id,
@@ -119,4 +98,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateEvent, generateOffers, generateDestination};
+export {generateId, generateEvent, generateOffers, destinations};

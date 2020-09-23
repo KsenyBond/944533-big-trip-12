@@ -13,19 +13,6 @@ const generateValue = (range) => {
   return range[randomIndex];
 };
 
-const shuffle = (array) => {
-  const [...arrayCopy] = array;
-
-  for (let i = arrayCopy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * i);
-    const temp = arrayCopy[i];
-    arrayCopy[i] = arrayCopy[j];
-    arrayCopy[j] = temp;
-  }
-
-  return arrayCopy;
-};
-
 const setNeutralTime = () => {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
@@ -72,27 +59,37 @@ const transformToLocaleDate = (event) => {
 };
 
 const sortTimeDown = (eventA, eventB) => {
-  return eventB.duration - eventA.duration;
+  const getDuration = (event) => {
+    return event.endTime - event.startTime;
+  };
+
+  return getDuration(eventB) - getDuration(eventA);
 };
 
 const sortPriceDown = (taskA, taskB) => {
   return taskB.price - taskA.price;
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
+const isDatesEqual = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return true;
   }
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
+  return moment(dateA).isSame(dateB, `day`);
 };
 
-export {getRandomInteger, generateValue, shuffle, setNeutralTime, transformToDateAndTime, transformToDatetime,
+const isEventPast = (endTime) => {
+  const currentDate = new Date();
+
+  return endTime.getTime() < currentDate.getTime();
+};
+
+const isEventFuture = (startTime) => {
+  const currentDate = new Date();
+
+  return startTime.getTime() > currentDate.getTime();
+};
+
+export {getRandomInteger, generateValue, setNeutralTime, transformToDateAndTime, transformToDatetime,
   transformToTime, transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
-  sortTimeDown, sortPriceDown, updateItem};
+  sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture};

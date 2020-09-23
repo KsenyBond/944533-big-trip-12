@@ -13,27 +13,31 @@ const generateType = () => {
   };
 };
 
-const generateDestination = (selectedPlace) => {
-  const generateRandomDescription = () => {
+const destinations = new Map();
+
+const generateRandomDescription = () => {
+  const getRandomDescription = () => {
     return DESTINATION_DESCRIPTION[getRandomInteger(0, DESTINATION_DESCRIPTION.length - 1)];
   };
-
-  const generateRandomPhotos = () => {
-    return `http://picsum.photos/248/152?r=${Math.random()}`;
-  };
-
   const destinationDescription =
-    new Array(getRandomInteger(1, 5))
-      .fill()
-      .map(generateRandomDescription);
+      new Array(getRandomInteger(1, 5))
+          .fill()
+          .map(getRandomDescription);
   const uniqueDestinationDescription = new Set(destinationDescription);
 
-  return {
-    place: selectedPlace || generateValue(EVENT_DESTINATIONS),
-    description: Array.from(uniqueDestinationDescription).join(` `),
-    photos: new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos),
-  };
+  return Array.from(uniqueDestinationDescription).join(` `);
 };
+
+const generateRandomPhotos = () => {
+  return `http://picsum.photos/248/152?r=${Math.random()}`;
+};
+
+EVENT_DESTINATIONS.forEach((place) => {
+  const description = generateRandomDescription();
+  const photos = new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos);
+
+  destinations.set(place, {place, description, photos});
+});
 
 const generateStartTime = () => {
   const daysGap = getRandomInteger(-MAX_DAYS_GAP, MAX_DAYS_GAP);
@@ -76,7 +80,7 @@ const generateOffers = (type, offersList) => {
 const generateEvent = () => {
   const id = generateId();
   const type = generateType();
-  const destination = generateDestination();
+  const destination = generateValue(Array.from(destinations.values()));
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);
   const price = getRandomInteger(10, 250);
@@ -94,4 +98,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateId, generateEvent, generateDestination};
+export {generateId, generateEvent, generateOffers, destinations};

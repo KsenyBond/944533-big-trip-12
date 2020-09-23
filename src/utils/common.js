@@ -7,10 +7,6 @@ const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-const getRandomArrayItem = (array) => {
-  return array[getRandomInteger(0, array.length - 1)];
-};
-
 const generateValue = (range) => {
   const randomIndex = getRandomInteger(0, range.length - 1);
 
@@ -94,6 +90,6 @@ const isEventFuture = (startTime) => {
   return startTime.getTime() > currentDate.getTime();
 };
 
-export {getRandomInteger, getRandomArrayItem, generateValue, setNeutralTime, transformToDateAndTime, transformToDatetime,
+export {getRandomInteger, generateValue, setNeutralTime, transformToDateAndTime, transformToDatetime,
   transformToTime, transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
   sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture};

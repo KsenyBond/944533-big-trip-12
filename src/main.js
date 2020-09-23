@@ -5,7 +5,7 @@ import FilterPresenter from "./presenter/filter.js";
 import EventsModel from "./model/events.js";
 import FilterModel from "./model/filter.js";
 import OffersModel from "./model/offers.js";
-import {generateEvent} from "./mock/event.js";
+import {generateEvent, destinations} from "./mock/event.js";
 import {availableOffers} from "./mock/offer.js";
 import {render, RenderPosition} from "./utils/render.js";
 import {EVENTS_NUMBER} from "./const.js";
@@ -30,7 +30,7 @@ const siteItineraryElement = document.querySelector(`.trip-events`);
 render(siteHeaderMainElement, new TripMainInfoView(events), RenderPosition.AFTER_BEGIN);
 render(siteHeaderControlsElement, new TripTabsView(), RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
 
-const tripPresenter = new TripPresenter(siteItineraryElement, eventsModel, offersModel, filterModel);
+const tripPresenter = new TripPresenter(siteItineraryElement, eventsModel, destinations, offersModel, filterModel);
 const filterPresenter = new FilterPresenter(siteHeaderControlsElement, filterModel, eventsModel);
 
 filterPresenter.init();

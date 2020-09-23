@@ -12,11 +12,12 @@ import {filter} from "../utils/filter.js";
 import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
 
 export default class Trip {
-  constructor(tripEventsContainer, eventsModel, offersModel, filterModel) {
+  constructor(tripEventsContainer, eventsModel, destinations, offersModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
     this._offersModel = offersModel;
     this._filterModel = filterModel;
+    this._destinations = destinations;
     this._currentSortType = SortType.EVENT;
     this._eventsPresenter = {};
     this._tripDaysList = [];
@@ -34,7 +35,7 @@ export default class Trip {
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents(), this._offersModel);
+    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents(), this._destinations, this._offersModel);
   }
 
   init() {
@@ -172,7 +173,7 @@ export default class Trip {
   }
 
   _renderEvent(eventsList, event) {
-    const eventPresenter = new EventPresenter(eventsList, this._handleViewAction, this._handleModeChange, this._offersModel);
+    const eventPresenter = new EventPresenter(eventsList, this._handleViewAction, this._handleModeChange, this._destinations, this._offersModel);
     eventPresenter.init(event);
     this._eventsPresenter[event.id] = eventPresenter;
   }

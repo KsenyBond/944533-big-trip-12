@@ -2,8 +2,7 @@ import flatpickr from "flatpickr";
 import he from "he";
 import SmartView from "./smart.js";
 import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
-import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, EVENT_TYPES, EVENT_DESTINATIONS} from "../const.js";
-import {generateDestination} from "../mock/event.js";
+import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, EVENT_TYPES} from "../const.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
@@ -14,7 +13,7 @@ const BLANK_EVENT = {
     activity: [`Check-in`, `Sightseeing`, `Restaurant`],
   },
   destination: {
-    place: ``,
+    place: `Rome`,
     description: ``,
     photos: ``,
   },
@@ -89,24 +88,24 @@ const createAvailableOffersTemplate = (availableOffers, selectedOffers, type) =>
 };
 
 const createDestinationTemplate = (possibleDestinations) => {
-  return possibleDestinations.map((destination) => `<option value="${destination}"></option>`).join(`\n`);
+  return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.place}"></option>`).join(``);
 };
 
-const createDestinationInfoTemplate = (destination) => {
-  return `${destination.description ?
+const createDestinationInfoTemplate = (destination, possibleDestinations) => {
+  return `${possibleDestinations.get(destination.place).description ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${destination.description}</p>
+      <p class="event__destination-description">${possibleDestinations.get(destination.place).description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${destination.photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${possibleDestinations.get(destination.place).photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
         </div>
       </div>
     </section>` : ``}`;
 };
 
-const createEventEditTemplate = (data, availableOffers) => {
+const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
   const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
 
   const typeName = type.name;
@@ -118,8 +117,8 @@ const createEventEditTemplate = (data, availableOffers) => {
   const end = transformToDateAndTime(endTime);
   const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type.name);
-  const destinationTemplate = createDestinationTemplate(EVENT_DESTINATIONS);
-  const destinationInfoTemplate = createDestinationInfoTemplate(destination);
+  const destinationTemplate = createDestinationTemplate(possibleDestinations);
+  const destinationInfoTemplate = createDestinationInfoTemplate(destination, possibleDestinations);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -188,10 +187,11 @@ const createEventEditTemplate = (data, availableOffers) => {
 };
 
 export default class EventEdit extends SmartView {
-  constructor(offersModel, event = BLANK_EVENT) {
+  constructor(destinations, offersModel, event = BLANK_EVENT) {
     super();
-    this._data = EventEdit.parseEventToData(event);
+    this._destinations = destinations;
     this._offersModel = offersModel;
+    this._data = EventEdit.parseEventToData(event);
     this._startDatepicker = null;
     this._endDatepicker = null;
 
@@ -210,7 +210,7 @@ export default class EventEdit extends SmartView {
   }
 
   get template() {
-    return createEventEditTemplate(this._data, this._offersModel.offers);
+    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinations);
   }
 
   restoreHandlers() {
@@ -265,16 +265,14 @@ export default class EventEdit extends SmartView {
 
   _destinationChangeHandler(evt) {
     evt.preventDefault();
+
+    const update = this._destinations.has(evt.target.value)
+      ? this._destinations.get(evt.target.value)
+      : null;
+
     this.updateData({
-      destination: generateDestination(evt.target.value)
+      destination: update
     });
-    // const update = this._detailsModel.getDetails().has(evt.target.value)
-    //   ? this._detailsModel.getDetails().get(evt.target.value)
-    //   : null;
-    //
-    // this.updateData({
-    //   destination: update
-    // });
   }
 
   _priceInputHandler(evt) {

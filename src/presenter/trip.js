@@ -9,18 +9,20 @@ import EventNewPresenter from "./event-new.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
 import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
 import {filter} from "../utils/filter.js";
-import {SortTypes, UserAction, UpdateType, FilterType} from "../const.js";
+import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
 
 export default class Trip {
-  constructor(tripEventsContainer, eventsModel, filterModel) {
+  constructor(tripEventsContainer, eventsModel, offersModel, filterModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._eventsModel = eventsModel;
+    this._offersModel = offersModel;
     this._filterModel = filterModel;
-    this._currentSortType = SortTypes.EVENT;
+    this._currentSortType = SortType.EVENT;
     this._eventsPresenter = {};
     this._tripDaysList = [];
 
     this._sortComponent = null;
+
     this._tripDaysComponent = new TripDaysView();
     this._noEventsComponent = new NoEventsView();
 
@@ -32,7 +34,7 @@ export default class Trip {
     this._eventsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
 
-    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents());
+    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents(), this._offersModel);
   }
 
   init() {
@@ -40,7 +42,7 @@ export default class Trip {
   }
 
   createEvent(newEventButtonElement) {
-    this._currentSortType = SortTypes.EVENT;
+    this._currentSortType = SortType.EVENT;
     this._filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._eventNewPresenter.init(newEventButtonElement, this._tripDaysComponent);
   }
@@ -48,16 +50,16 @@ export default class Trip {
   _getEvents() {
     const filterType = this._filterModel.filter;
     const events = this._eventsModel.events;
-    const filtredEvents = filter[filterType](events);
+    const filteredEvents = filter[filterType](events);
 
     switch (this._currentSortType) {
-      case SortTypes.TIME:
-        return filtredEvents.sort(sortTimeDown);
-      case SortTypes.PRICE:
-        return filtredEvents.sort(sortPriceDown);
+      case SortType.TIME:
+        return filteredEvents.sort(sortTimeDown);
+      case SortType.PRICE:
+        return filteredEvents.sort(sortPriceDown);
     }
 
-    return filtredEvents;
+    return filteredEvents;
   }
 
   _handleModeChange() {
@@ -88,7 +90,7 @@ export default class Trip {
         break;
       case UpdateType.MAJOR:
         if (update && typeof update === `boolean`) {
-          this._currentSortType = SortTypes.EVENT;
+          this._currentSortType = SortType.EVENT;
         }
 
         this._clearTrip();
@@ -139,7 +141,7 @@ export default class Trip {
     const eventsDates = this._getEvents()
       .map((event) => transformToLocaleDate(event));
     let eventsUniqueDates = Array.from(new Set(eventsDates));
-    if (this._currentSortType !== SortTypes.EVENT) {
+    if (this._currentSortType !== SortType.EVENT) {
       eventsUniqueDates = [``];
     }
 
@@ -161,7 +163,7 @@ export default class Trip {
     this._eventsListComponent = new TripEventsListView();
     render(this._tripDayComponent, this._eventsListComponent, RenderPosition.BEFORE_END);
     let uniqueDateEvents = this._getEvents().filter((event) => transformToLocaleDate(event) === uniqueDate);
-    if (this._currentSortType !== SortTypes.EVENT) {
+    if (this._currentSortType !== SortType.EVENT) {
       uniqueDateEvents = this._getEvents();
     }
     uniqueDateEvents.forEach((uniqueDateEvent) => {
@@ -170,7 +172,7 @@ export default class Trip {
   }
 
   _renderEvent(eventsList, event) {
-    const eventPresenter = new EventPresenter(eventsList, this._handleViewAction, this._handleModeChange);
+    const eventPresenter = new EventPresenter(eventsList, this._handleViewAction, this._handleModeChange, this._offersModel);
     eventPresenter.init(event);
     this._eventsPresenter[event.id] = eventPresenter;
   }

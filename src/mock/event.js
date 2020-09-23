@@ -1,20 +1,21 @@
-import {getRandomInteger, generateValue, shuffle} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_AVAILABLE_OFFERS_NUMBER, MAX_SELECTED_OFFERS_NUMBER,
-  DESTINATION_PHOTOS, MAX_DAYS_GAP, eventsTypes, destinations, destinationRandomDescriptions} from "../const.js";
+import {availableOffers} from "./offer.js";
+import {getRandomInteger, generateValue} from "../utils/common.js";
+import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER,
+  DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const generateType = () => {
   return {
-    name: generateValue(eventsTypes),
-    transfer: eventsTypes.slice(0, TRANSFER_TYPES),
-    activity: eventsTypes.slice(TRANSFER_TYPES),
+    name: generateValue(EVENT_TYPES),
+    transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
+    activity: EVENT_TYPES.slice(TRANSFER_TYPES),
   };
 };
 
 const generateDestination = (selectedPlace) => {
   const generateRandomDescription = () => {
-    return destinationRandomDescriptions[getRandomInteger(0, destinationRandomDescriptions.length - 1)];
+    return DESTINATION_DESCRIPTION[getRandomInteger(0, DESTINATION_DESCRIPTION.length - 1)];
   };
 
   const generateRandomPhotos = () => {
@@ -28,7 +29,7 @@ const generateDestination = (selectedPlace) => {
   const uniqueDestinationDescription = new Set(destinationDescription);
 
   return {
-    place: selectedPlace || generateValue(destinations),
+    place: selectedPlace || generateValue(EVENT_DESTINATIONS),
     description: Array.from(uniqueDestinationDescription).join(` `),
     photos: new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos),
   };
@@ -56,28 +57,20 @@ const generateEndTime = (start) => {
   return new Date(start.getTime() + minutesGap);
 };
 
-const generateOffers = (availableOnly = false) => {
-  const offers = {
-    luggage: `Add luggage`,
-    meal: `Add meal`,
-    comfort: `Switch to comfort`,
-    seats: `Choose seats`,
-    train: `Travel by train`,
-    tickets: `Book tickets`,
-    lunch: `Lunch in city`,
-  };
-  const allOffers = [];
+const generateOffers = (type, offersList) => {
+  const typeMatchingOffers = offersList.find((element) => element.type === type.name).offers;
 
-  for (const offerType of Object.keys(offers)) {
-    allOffers.push({
-      type: offerType,
-      name: offers[offerType],
-      price: getRandomInteger(10, 30),
-      isChecked: availableOnly || allOffers.filter((offer) => offer.isChecked).length >= MAX_SELECTED_OFFERS_NUMBER ? false : Boolean(getRandomInteger(0, 1)),
-    });
+  const selectedOffers = [];
+
+  for (const offer of typeMatchingOffers) {
+    if (selectedOffers.length < MAX_SELECTED_OFFERS_NUMBER) {
+      if (getRandomInteger(0, 1)) {
+        selectedOffers.push(offer);
+      }
+    }
   }
 
-  return shuffle(allOffers).slice(0, getRandomInteger(0, MAX_AVAILABLE_OFFERS_NUMBER));
+  return selectedOffers;
 };
 
 const generateEvent = () => {
@@ -87,7 +80,7 @@ const generateEvent = () => {
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);
   const price = getRandomInteger(10, 250);
-  const offers = generateOffers();
+  const offers = generateOffers(type, Array.from(availableOffers.values()));
 
   return {
     id,
@@ -101,4 +94,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateId, generateEvent, generateOffers, generateDestination};
+export {generateId, generateEvent, generateDestination};

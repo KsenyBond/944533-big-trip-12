@@ -51,6 +51,6 @@ export default class Events extends Observer {
       ...this._events.slice(index + 1)
     ];
 
-    this._notify(updateType);
+    this._notify(updateType, update);
   }
 }

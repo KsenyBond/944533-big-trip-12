@@ -4,11 +4,12 @@ import {render, RenderPosition, removeElement, replaceElement} from "../utils/re
 import {UserAction, UpdateType} from "../const.js";
 
 export default class EventNew {
-  constructor(tripEventsContainer, handleEventChange, noEventsComponent, currentEvents) {
+  constructor(tripEventsContainer, handleEventChange, noEventsComponent, currentEvents, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._handleEventChange = handleEventChange;
     this._noEventsComponent = noEventsComponent;
     this._currentEvents = currentEvents;
+    this._offersModel = offersModel;
 
     this._eventEditComponent = null;
 
@@ -24,7 +25,7 @@ export default class EventNew {
 
     this._newEventButtonElement = newEventButtonElement;
     this._tripDaysComponent = tripDaysComponent;
-    this._eventEditComponent = new EventEditView();
+    this._eventEditComponent = new EventEditView(this._offersModel);
 
     this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);

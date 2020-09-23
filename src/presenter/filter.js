@@ -48,19 +48,11 @@ export default class Filter {
   }
 
   _getFilters() {
-    return [
-      {
-        type: FilterType.EVERYTHING,
-        name: `EVERYTHING`
-      },
-      {
-        type: FilterType.PAST,
-        name: `PAST`
-      },
-      {
-        type: FilterType.FUTURE,
-        name: `FUTURE`
-      }
-    ];
+    return Object.values(FilterType).map((filter) => {
+      return {
+        type: filter,
+        name: filter.toUpperCase()
+      };
+    });
   }
 }

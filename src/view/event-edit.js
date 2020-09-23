@@ -13,7 +13,7 @@ const BLANK_EVENT = {
     activity: [`Check-in`, `Sightseeing`, `Restaurant`],
   },
   destination: {
-    place: `Rome`,
+    place: ``,
     description: ``,
     photos: ``,
   },
@@ -39,11 +39,11 @@ const createEventTypeItemsTemplate = (typesList, currentType) => {
     </div>`).join(``);
 };
 
-const createButtonsTemplate = (destination, isFavorite) => {
+const createButtonsTemplate = (isNewEvent, isFavorite) => {
   const isChecked = isFavorite ? `checked` : ``;
 
   return `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-    ${destination ?
+    ${!isNewEvent ?
     `<button class="event__reset-btn" type="reset">Delete</button>
      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
       <label class="event__favorite-btn" for="event-favorite-1">
@@ -91,8 +91,8 @@ const createDestinationTemplate = (possibleDestinations) => {
   return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.place}"></option>`).join(``);
 };
 
-const createDestinationInfoTemplate = (destination, possibleDestinations) => {
-  return `${possibleDestinations.get(destination.place).description ?
+const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinations) => {
+  return `${!isNewEvent ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">${possibleDestinations.get(destination.place).description}</p>
@@ -108,6 +108,8 @@ const createDestinationInfoTemplate = (destination, possibleDestinations) => {
 const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
   const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
 
+  const isNewEvent = !destination.place;
+
   const typeName = type.name;
   const preposition = type.transfer.includes(typeName) ? `to` : `in`;
   const iconType = typeName.toLowerCase();
@@ -115,10 +117,10 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
   const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
   const start = transformToDateAndTime(startTime);
   const end = transformToDateAndTime(endTime);
-  const buttonsTemplate = createButtonsTemplate(destination.place, isFavorite);
+  const buttonsTemplate = createButtonsTemplate(isNewEvent, isFavorite);
   const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type.name);
   const destinationTemplate = createDestinationTemplate(possibleDestinations);
-  const destinationInfoTemplate = createDestinationInfoTemplate(destination, possibleDestinations);
+  const destinationInfoTemplate = createDestinationInfoTemplate(isNewEvent, destination, possibleDestinations);
 
   return (
     `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -268,7 +270,11 @@ export default class EventEdit extends SmartView {
 
     const update = this._destinations.has(evt.target.value)
       ? this._destinations.get(evt.target.value)
-      : null;
+      : {
+        place: ``,
+        description: ``,
+        photos: ``,
+      };
 
     this.updateData({
       destination: update

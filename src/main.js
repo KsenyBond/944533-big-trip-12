@@ -38,8 +38,10 @@ tripPresenter.init();
 
 const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
 
-newEventButtonElement.addEventListener(`click`, (evt) => {
+const newEventButtonClickHandler = (evt) => {
   evt.preventDefault();
   newEventButtonElement.setAttribute(`disabled`, `disabled`);
   tripPresenter.createEvent(newEventButtonElement);
-});
+};
+
+newEventButtonElement.addEventListener(`click`, newEventButtonClickHandler);

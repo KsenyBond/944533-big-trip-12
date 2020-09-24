@@ -13,18 +13,20 @@ export default class EventNew {
     this._offersModel = offersModel;
 
     this._eventEditComponent = null;
+    this._destroyCallback = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(newEventButtonElement, tripDaysComponent) {
+  init(tripDaysComponent, eventNewFormCloseHandler) {
+    this._destroyCallback = eventNewFormCloseHandler;
+
     if (this._eventEditComponent !== null) {
       return;
     }
 
-    this._newEventButtonElement = newEventButtonElement;
     this._tripDaysComponent = tripDaysComponent;
     this._eventEditComponent = new EventEditView(this._destinations, this._offersModel);
 
@@ -45,9 +47,12 @@ export default class EventNew {
       return;
     }
 
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
+    }
+
     removeElement(this._eventEditComponent);
     this._eventEditComponent = null;
-    this._newEventButtonElement.removeAttribute(`disabled`);
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 

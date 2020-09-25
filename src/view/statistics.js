@@ -1,4 +1,150 @@
+import Chart from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import SmartView from "./smart.js";
+import {divideCostsByTypes, divideByTransportTypes, divideDurationsByTypes} from '../utils/statistics.js';
+
+const BAR_HEIGHT = 55;
+
+const renderMoneyChart = (moneyCtx, events) => {
+  const prices = new Map(divideCostsByTypes(events));
+  moneyCtx.height = BAR_HEIGHT * prices.size;
+
+  return new Chart(moneyCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: [...prices.keys()],
+      datasets: [{
+        data: [...prices.values()],
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`,
+        minBarLength: 50
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: `end`,
+          align: `start`,
+          formatter: (val) => `€ ${val}`
+        }
+      },
+      title: {
+        display: true,
+        text: `MONEY`,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false,
+      }
+    }
+  });
+};
+
+const renderChart = (canvasCtx, events, title, label) => {
+  canvasCtx.height = BAR_HEIGHT * events.size;
+
+  return new Chart(canvasCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: [...events.keys()],
+      datasets: [{
+        data: [...events.values()],
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`,
+        minBarLength: 50
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: `end`,
+          align: `start`,
+          formatter: (val) => `${val}${label}`
+        }
+      },
+      title: {
+        display: true,
+        text: title,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false,
+      }
+    }
+  });
+};
 
 const createStatisticsTemplate = () => {
 
@@ -27,6 +173,12 @@ export default class Statistics extends SmartView {
     super();
 
     this._events = events;
+
+    this._moneyChart = null;
+    this._transportChart = null;
+    this._timeSpendChart = null;
+
+    this._setCharts();
   }
 
   get template() {
@@ -35,9 +187,30 @@ export default class Statistics extends SmartView {
 
   removeElement() {
     super.removeElement();
+
+    if (this._moneyChart !== null || this._transportChart !== null || this._timeSpendChart !== null) {
+      this._moneyChart = null;
+      this._transportChart = null;
+      this._timeSpendChart = null;
+    }
   }
 
   _setCharts() {
+    if (this._moneyChart !== null || this._transportChart !== null || this._timeSpendChart !== null) {
+      this._moneyChart = null;
+      this._transportChart = null;
+      this._timeSpendChart = null;
+    }
 
+    const moneyCtx = this.element.querySelector(`.statistics__chart--money`);
+    const transportCtx = this.element.querySelector(`.statistics__chart--transport`);
+    const timeSpendCtx = this.element.querySelector(`.statistics__chart--time`);
+
+    const transportTypes = new Map(divideByTransportTypes(this._events));
+    const durations = new Map(divideDurationsByTypes(this._events));
+
+    this._moneyChart = renderMoneyChart(moneyCtx, this._events);
+    this._transportChart = renderChart(transportCtx, transportTypes, `TRANSPORT`, `x`);
+    this._timeSpendChart = renderChart(timeSpendCtx, durations, `TIME SPENT`, `H`);
   }
 }

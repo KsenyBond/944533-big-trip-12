@@ -8,7 +8,7 @@ import FilterModel from "./model/filter.js";
 import OffersModel from "./model/offers.js";
 import {generateEvent, destinations} from "./mock/event.js";
 import {availableOffers} from "./mock/offer.js";
-import {render, RenderPosition} from "./utils/render.js";
+import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {EVENTS_NUMBER, MenuItem} from "./const.js";
 import {FilterType, UpdateType} from "./const";
 
@@ -42,10 +42,13 @@ const eventNewFormCloseHandler = () => {
   newEventButtonElement.removeAttribute(`disabled`);
 };
 
+let statisticsComponent = null;
+
 const siteMenuTabsClickHandler = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
       tripPresenter.destroy();
+      removeElement(statisticsComponent);
       tripPresenter.init();
 
       siteMenuTabsComponent.setMenuItem(MenuItem.TABLE, MenuItem.STATS);
@@ -57,6 +60,9 @@ const siteMenuTabsClickHandler = (menuItem) => {
     case MenuItem.STATS:
       filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       tripPresenter.destroy();
+
+      statisticsComponent = new StatisticsView(eventsModel.events);
+      render(SiteBodyElement, statisticsComponent, RenderPosition.BEFORE_END);
 
       siteMenuTabsComponent.setMenuItem(MenuItem.STATS, MenuItem.TABLE);
 
@@ -70,6 +76,10 @@ siteMenuTabsComponent.setMenuTabsClickHandler(siteMenuTabsClickHandler);
 const newEventButtonClickHandler = (evt) => {
   evt.preventDefault();
   newEventButtonElement.setAttribute(`disabled`, `disabled`);
+
+  if (statisticsComponent !== null) {
+    removeElement(statisticsComponent);
+  }
 
   tripPresenter.destroy();
   filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
@@ -85,5 +95,4 @@ const newEventButtonClickHandler = (evt) => {
 newEventButtonElement.addEventListener(`click`, newEventButtonClickHandler);
 
 filterPresenter.init();
-// tripPresenter.init();
-render(SiteBodyElement, new StatisticsView(), RenderPosition.BEFORE_END);
+tripPresenter.init();

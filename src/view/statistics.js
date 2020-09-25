@@ -13,7 +13,7 @@ const renderMoneyChart = (moneyCtx, events) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [...prices.keys()],
+      labels: [...prices.keys()].map((typeToFormat) => typeToFormat[0].toUpperCase() + typeToFormat.slice(1)),
       datasets: [{
         data: [...prices.values()],
         backgroundColor: `#ffffff`,
@@ -83,7 +83,7 @@ const renderChart = (canvasCtx, events, title, label) => {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [...events.keys()],
+      labels: [...events.keys()].map((typeToFormat) => typeToFormat[0].toUpperCase() + typeToFormat.slice(1)),
       datasets: [{
         data: [...events.values()],
         backgroundColor: `#ffffff`,
@@ -147,7 +147,6 @@ const renderChart = (canvasCtx, events, title, label) => {
 };
 
 const createStatisticsTemplate = () => {
-
 
   return (
     `<section class="statistics">

@@ -1,6 +1,7 @@
 import he from 'he';
 import AbstractView from "./abstract.js";
 import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
+import {TRANSFER_TYPES} from "../const.js";
 
 const createEventSelectedOffersTemplate = (offers) => {
   return offers.map((offer) => {
@@ -17,9 +18,10 @@ const createEventSelectedOffersTemplate = (offers) => {
 const createEventTemplate = (event) => {
   const {type, destination, startTime, endTime, price, offers} = event;
 
-  const typeName = type.name;
-  const preposition = type.transfer.includes(typeName) ? `to` : `in`;
-  const iconType = typeName.toLowerCase();
+  const formatTypeName = (typeToFormat) => {
+    return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
+  };
+  const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
   const start = transformToTime(startTime);
   const end = transformToTime(endTime);
   const datetimeStart = `${transformToDatetimeAttr(startTime)}T${start}`;
@@ -31,9 +33,9 @@ const createEventTemplate = (event) => {
     `<li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${iconType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${typeName} ${preposition} ${destination.place}</h3>
+        <h3 class="event__title">${formatTypeName(type)} ${preposition} ${destination.place}</h3>
 
         <div class="event__schedule">
           <p class="event__time">

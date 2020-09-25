@@ -2,16 +2,12 @@ import flatpickr from "flatpickr";
 import he from "he";
 import SmartView from "./smart.js";
 import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
-import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, EVENT_TYPES} from "../const.js";
+import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, ACTIVITY_TYPES} from "../const.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const BLANK_EVENT = {
-  type: {
-    name: `Flight`,
-    transfer: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
-    activity: [`Check-in`, `Sightseeing`, `Restaurant`],
-  },
+  type: `flight`,
   destination: {
     place: ``,
     description: ``,
@@ -30,12 +26,12 @@ const FLATPICKR_OPTIONS = {
   'time_24hr': true,
 };
 
-const createEventTypeItemsTemplate = (typesList, currentType) => {
+const createEventTypeItemsTemplate = (typesList, currentType, formatTypeName) => {
   return typesList.map((type) =>
     `<div class="event__type-item">
-      <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio"
-      name="event-type" value="${type.toLowerCase()}" data-type="${type}" ${currentType === type ? `checked` : ``}>
-      <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio"
+      name="event-type" value="${type}" data-type="${type}" ${currentType === type ? `checked` : ``}>
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${formatTypeName(type)}</label>
     </div>`).join(``);
 };
 
@@ -110,15 +106,16 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 
   const isNewEvent = !destination.place;
 
-  const typeName = type.name;
-  const preposition = type.transfer.includes(typeName) ? `to` : `in`;
-  const iconType = typeName.toLowerCase();
-  const transferTypesTemplate = createEventTypeItemsTemplate(type.transfer, type.name);
-  const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
+  const formatTypeName = (typeToFormat) => {
+    return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
+  };
+  const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
+  const transferTypesTemplate = createEventTypeItemsTemplate(TRANSFER_TYPES, type, formatTypeName);
+  const activityTypesTemplate = createEventTypeItemsTemplate(ACTIVITY_TYPES, type, formatTypeName);
   const start = transformToDateAndTime(startTime);
   const end = transformToDateAndTime(endTime);
   const buttonsTemplate = createButtonsTemplate(isNewEvent, isFavorite);
-  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type.name);
+  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type);
   const destinationTemplate = createDestinationTemplate(possibleDestinations);
   const destinationInfoTemplate = createDestinationInfoTemplate(isNewEvent, destination, possibleDestinations);
 
@@ -128,7 +125,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${iconType}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -147,7 +144,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${typeName} ${preposition}
+            ${formatTypeName(type)} ${preposition}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
           name="event-destination" value="${destination.place}" list="destination-list-1">
@@ -256,11 +253,7 @@ export default class EventEdit extends SmartView {
   _eventTypeChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      type: {
-        name: evt.target.dataset.type,
-        transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
-        activity: EVENT_TYPES.slice(TRANSFER_TYPES),
-      },
+      type: evt.target.dataset.type,
       offers: []
     });
   }

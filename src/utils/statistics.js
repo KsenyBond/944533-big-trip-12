@@ -1,9 +1,10 @@
 import moment from 'moment';
+import {TRANSFER_TYPES} from "../const.js";
 
 const divideCostsByTypes = (events) => {
-  return [...new Set(events.map((event) => event.type.name))]
+  return [...new Set(events.map((event) => event.type))]
     .map((type) => {
-      const eventsByType = events.filter((event) => event.type.name === type);
+      const eventsByType = events.filter((event) => event.type === type);
       const sum = eventsByType.reduce((acc, val) => ({price: acc.price + val.price}));
       return [type, sum.price];
     })
@@ -11,19 +12,19 @@ const divideCostsByTypes = (events) => {
 };
 
 const divideByTransportTypes = (events) => {
-  const transferTypes = [`Flight`, `Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`];
+  const transferTypes = Object.assign([], TRANSFER_TYPES);
 
   return transferTypes
     .map((type) => {
-      return [type, events.filter((event) => event.type.name === type).length];
+      return [type, events.filter((event) => event.type === type).length];
     })
     .sort(([, countA], [, countB]) => countB - countA);
 };
 
 const divideDurationsByTypes = (events) => {
-  return [...new Set(events.map((event) => event.type.name))]
+  return [...new Set(events.map((event) => event.type))]
     .map((type) => {
-      const eventsByType = events.filter((event) => event.type.name === type);
+      const eventsByType = events.filter((event) => event.type === type);
       const sum = eventsByType.reduce((acc, val) => (moment(acc) + moment(val.startTime).diff(val.endTime)), 0);
       return [type, Math.ceil(moment.duration(sum).asHours()).toString().replace(`-`, ``)];
     })

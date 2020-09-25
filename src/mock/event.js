@@ -1,17 +1,8 @@
 import {availableOffers} from "./offer.js";
 import {getRandomInteger, generateValue} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER,
-  DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
+import {MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
-const generateType = () => {
-  return {
-    name: generateValue(EVENT_TYPES),
-    transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
-    activity: EVENT_TYPES.slice(TRANSFER_TYPES),
-  };
-};
 
 const destinations = new Map();
 
@@ -62,7 +53,7 @@ const generateEndTime = (start) => {
 };
 
 const generateOffers = (type, offersList) => {
-  const typeMatchingOffers = offersList.find((element) => element.type === type.name).offers;
+  const typeMatchingOffers = offersList.find((element) => element.type === type).offers;
 
   const selectedOffers = [];
 
@@ -79,7 +70,7 @@ const generateOffers = (type, offersList) => {
 
 const generateEvent = () => {
   const id = generateId();
-  const type = generateType();
+  const type = generateValue(EVENT_TYPES);
   const destination = generateValue(Array.from(destinations.values()));
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);

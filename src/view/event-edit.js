@@ -2,7 +2,7 @@ import flatpickr from "flatpickr";
 import he from "he";
 import SmartView from "./smart.js";
 import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
-import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, ACTIVITY_TYPES} from "../const.js";
+import {TRANSFER_TYPES, ACTIVITY_TYPES} from "../const.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
@@ -290,12 +290,10 @@ export default class EventEdit extends SmartView {
     let update = this._data.offers.slice();
 
     if (evt.target.checked) {
-      if (this._data.offers.length < MAX_SELECTED_OFFERS_NUMBER) {
-        update.push({
-          title: evt.target.dataset.title,
-          price: Number(evt.target.dataset.price)
-        });
-      }
+      update.push({
+        title: evt.target.dataset.title,
+        price: Number(evt.target.dataset.price)
+      });
     } else {
       update = update.filter((offer) => offer.title !== evt.target.dataset.title);
     }

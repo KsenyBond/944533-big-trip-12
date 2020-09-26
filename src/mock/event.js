@@ -1,6 +1,6 @@
 import {availableOffers} from "./offer.js";
 import {getRandomInteger, generateValue} from "../utils/common.js";
-import {MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
+import {MINUTES_IN_DAY, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
@@ -58,10 +58,8 @@ const generateOffers = (type, offersList) => {
   const selectedOffers = [];
 
   for (const offer of typeMatchingOffers) {
-    if (selectedOffers.length < MAX_SELECTED_OFFERS_NUMBER) {
-      if (getRandomInteger(0, 1)) {
-        selectedOffers.push(offer);
-      }
+    if (getRandomInteger(0, 1)) {
+      selectedOffers.push(offer);
     }
   }
 

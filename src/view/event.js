@@ -1,7 +1,7 @@
 import he from 'he';
 import AbstractView from "./abstract.js";
 import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
-import {TRANSFER_TYPES} from "../const.js";
+import {TRANSFER_TYPES, MAX_SHOWN_OFFERS_NUMBER} from "../const.js";
 
 const createEventSelectedOffersTemplate = (offers) => {
   return offers.map((offer) => {
@@ -27,7 +27,7 @@ const createEventTemplate = (event) => {
   const datetimeStart = `${transformToDatetimeAttr(startTime)}T${start}`;
   const datetimeEnd = `${transformToDatetimeAttr(endTime)}T${end}`;
   const durationDHM = generateDurationDHM(event.endTime - event.startTime);
-  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers);
+  const selectedOffersTemplate = createEventSelectedOffersTemplate(offers.length > 3 ? offers.slice(0, MAX_SHOWN_OFFERS_NUMBER) : offers);
 
   return (
     `<li class="trip-events__item">

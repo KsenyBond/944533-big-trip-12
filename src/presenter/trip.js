@@ -9,7 +9,7 @@ import EventNewPresenter from "./event-new.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
 import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
 import {filter} from "../utils/filter.js";
-import {SortType, UserAction, UpdateType, FilterType} from "../const.js";
+import {SortType, UserAction, UpdateType} from "../const.js";
 
 export default class Trip {
   constructor(tripEventsContainer, eventsModel, destinations, offersModel, filterModel) {
@@ -32,20 +32,27 @@ export default class Trip {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._eventsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._getEvents(), this._destinations, this._offersModel);
   }
 
   init() {
+    this._eventsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     this._renderTrip();
   }
 
-  createEvent(newEventButtonElement) {
-    this._currentSortType = SortType.EVENT;
-    this._filterModel.changeFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._eventNewPresenter.init(newEventButtonElement, this._tripDaysComponent);
+  destroy() {
+    this._clearTrip(true);
+
+    removeElement(this._tripDaysComponent);
+
+    this._eventsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createEvent(eventNewFormCloseHandler) {
+    this._eventNewPresenter.init(this._tripDaysComponent, eventNewFormCloseHandler);
   }
 
   _getEvents() {
@@ -121,7 +128,7 @@ export default class Trip {
     render(this._tripEventsContainer, this._sortComponent, RenderPosition.AFTER_BEGIN);
   }
 
-  _clearTrip() {
+  _clearTrip(resetSortType = false) {
     this._tripDaysList.forEach((tripDay) => removeElement(tripDay));
     this._eventNewPresenter.destroy();
     Object
@@ -131,6 +138,10 @@ export default class Trip {
 
     removeElement(this._sortComponent);
     removeElement(this._noEventsComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.EVENT;
+    }
   }
 
   _renderTripDays() {

@@ -1,34 +1,9 @@
 import {availableOffers} from "./offer.js";
+import {destinations} from "./destination.js";
 import {getRandomInteger, generateValue} from "../utils/common.js";
-import {MINUTES_IN_DAY, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
+import {MINUTES_IN_DAY, MAX_DAYS_GAP, EVENT_TYPES} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
-const destinations = new Map();
-
-const generateRandomDescription = () => {
-  const getRandomDescription = () => {
-    return DESTINATION_DESCRIPTION[getRandomInteger(0, DESTINATION_DESCRIPTION.length - 1)];
-  };
-  const destinationDescription =
-      new Array(getRandomInteger(1, 5))
-          .fill()
-          .map(getRandomDescription);
-  const uniqueDestinationDescription = new Set(destinationDescription);
-
-  return Array.from(uniqueDestinationDescription).join(` `);
-};
-
-const generateRandomPhotos = () => {
-  return `http://picsum.photos/248/152?r=${Math.random()}`;
-};
-
-EVENT_DESTINATIONS.forEach((place) => {
-  const description = generateRandomDescription();
-  const photos = new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos);
-
-  destinations.set(place, {place, description, photos});
-});
 
 const generateStartTime = () => {
   const daysGap = getRandomInteger(-MAX_DAYS_GAP, MAX_DAYS_GAP);
@@ -87,4 +62,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateId, generateEvent, generateOffers, destinations};
+export {generateId, generateEvent, generateOffers};

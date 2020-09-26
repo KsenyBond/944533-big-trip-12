@@ -9,9 +9,9 @@ import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 const BLANK_EVENT = {
   type: `flight`,
   destination: {
-    place: ``,
+    name: ``,
     description: ``,
-    photos: ``,
+    pictures: []
   },
   startTime: setNeutralTime(),
   endTime: setNeutralTime(),
@@ -84,18 +84,18 @@ const createAvailableOffersTemplate = (availableOffers, selectedOffers, type) =>
 };
 
 const createDestinationTemplate = (possibleDestinations) => {
-  return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.place}"></option>`).join(``);
+  return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.name}"></option>`).join(``);
 };
 
 const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinations) => {
   return `${!isNewEvent ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${possibleDestinations.get(destination.place).description}</p>
+      <p class="event__destination-description">${possibleDestinations.get(destination.name).description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${possibleDestinations.get(destination.place).photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${possibleDestinations.get(destination.name).pictures.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
         </div>
       </div>
     </section>` : ``}`;
@@ -104,7 +104,7 @@ const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinat
 const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
   const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
 
-  const isNewEvent = !destination.place;
+  const isNewEvent = !destination.name;
 
   const formatTypeName = (typeToFormat) => {
     return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
@@ -147,7 +147,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             ${formatTypeName(type)} ${preposition}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
-          name="event-destination" value="${destination.place}" list="destination-list-1">
+          name="event-destination" value="${destination.name}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinationTemplate}
           </datalist>
@@ -186,9 +186,9 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 };
 
 export default class EventEdit extends SmartView {
-  constructor(destinations, offersModel, event = BLANK_EVENT) {
+  constructor(destinationsModel, offersModel, event = BLANK_EVENT) {
     super();
-    this._destinations = destinations;
+    this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
     this._data = EventEdit.parseEventToData(event);
     this._startDatepicker = null;
@@ -209,7 +209,7 @@ export default class EventEdit extends SmartView {
   }
 
   get template() {
-    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinations);
+    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinationsModel.destination);
   }
 
   restoreHandlers() {
@@ -261,12 +261,12 @@ export default class EventEdit extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
 
-    const update = this._destinations.has(evt.target.value)
-      ? this._destinations.get(evt.target.value)
+    const update = this._destinationsModel.destination.has(evt.target.value)
+      ? this._destinationsModel.destination.get(evt.target.value)
       : {
-        place: ``,
+        name: ``,
         description: ``,
-        photos: ``,
+        pictures: []
       };
 
     this.updateData({

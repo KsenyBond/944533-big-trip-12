@@ -6,8 +6,10 @@ import FilterPresenter from "./presenter/filter.js";
 import EventsModel from "./model/events.js";
 import FilterModel from "./model/filter.js";
 import OffersModel from "./model/offers.js";
-import {generateEvent, destinations} from "./mock/event.js";
+import DestinationsModel from './model/destinations.js';
+import {generateEvent} from "./mock/event.js";
 import {availableOffers} from "./mock/offer.js";
+import {destinations} from "./mock/destination.js";
 import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {EVENTS_NUMBER, MenuItem, FilterType, UpdateType} from "./const.js";
 import Api from "./api.js";
@@ -22,7 +24,7 @@ const events = new Array(EVENTS_NUMBER)
 const api = new Api(END_POINT, AUTHORIZATION);
 
 api.events.then((events) => {
-  console.log(events);
+  // console.log(events);
   // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
   // а ещё на сервере используется snake_case, а у нас camelCase.
   // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
@@ -37,6 +39,9 @@ offersModel.offers = availableOffers;
 
 const filterModel = new FilterModel();
 
+const destinationsModel = new DestinationsModel();
+destinationsModel.destination = destinations;
+
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
 const siteHeaderControlsElement = siteHeaderMainElement.querySelector(`.trip-main__trip-controls`);
 const siteHeaderControlsHiddenElement = siteHeaderMainElement.querySelector(`.trip-controls .visually-hidden:last-child`);
@@ -46,7 +51,7 @@ const siteMenuTabsComponent = new TripTabsView();
 render(siteHeaderMainElement, new TripMainInfoView(events), RenderPosition.AFTER_BEGIN);
 render(siteHeaderControlsElement, siteMenuTabsComponent, RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
 
-const tripPresenter = new TripPresenter(siteItineraryElement, eventsModel, destinations, offersModel, filterModel);
+const tripPresenter = new TripPresenter(siteItineraryElement, eventsModel, destinationsModel, offersModel, filterModel);
 const filterPresenter = new FilterPresenter(siteHeaderControlsElement, filterModel, eventsModel);
 const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
 const SiteBodyElement = document.querySelector(`.page-main .page-body__container`);

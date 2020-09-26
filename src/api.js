@@ -36,7 +36,7 @@ export default class Api {
 
   updateEvent(event) {
     return this._load({
-      url: `tasks/${event.id}`,
+      url: `points/${event.id}`,
       method: Method.PUT,
       body: JSON.stringify(EventsModel.adaptToServer(event)),
       headers: new Headers({"Content-Type": `application/json`})

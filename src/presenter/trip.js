@@ -95,15 +95,6 @@ export default class Trip {
       case UserAction.DELETE_EVENT:
         this._eventsModel.deleteEvent(updateType, update);
         break;
-      case UpdateType.INIT:
-        if (!this._destinationsModel.destination || !this._offersModel.offers) {
-          this._isDataAvailable = false;
-        }
-
-        this._isLoading = false;
-        removeElement(this._loadingComponent);
-        this._renderTrip();
-        break;
     }
   }
 
@@ -118,6 +109,15 @@ export default class Trip {
         }
 
         this._clearTrip();
+        this._renderTrip();
+        break;
+      case UpdateType.INIT:
+        if (!this._destinationsModel.destination || !this._offersModel.offers) {
+          this._isDataAvailable = false;
+        }
+
+        this._isLoading = false;
+        removeElement(this._loadingComponent);
         this._renderTrip();
         break;
     }

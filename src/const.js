@@ -51,7 +51,8 @@ const UserAction = {
 
 const UpdateType = {
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 const FilterType = {

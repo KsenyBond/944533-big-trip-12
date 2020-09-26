@@ -30,7 +30,7 @@ const createEventTypeItemsTemplate = (typesList, currentType, formatTypeName) =>
   return typesList.map((type) =>
     `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio"
-      name="event-type" value="${type}" data-type="${type}" ${currentType === type ? `checked` : ``}>
+      name="event-type" value="${type}" ${currentType === type ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${formatTypeName(type)}</label>
     </div>`).join(``);
 };
@@ -253,7 +253,7 @@ export default class EventEdit extends SmartView {
   _eventTypeChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      type: evt.target.dataset.type,
+      type: evt.target.value,
       offers: []
     });
   }

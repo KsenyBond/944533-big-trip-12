@@ -22,6 +22,18 @@ export default class Api {
       .then((events) => events.map(EventsModel.adaptToClient));
   }
 
+  get destination() {
+    return this._load({url: `destinations`})
+      .then(Api.toJSON)
+      .then((destinations) => new Map(destinations.map((destination) => [destination.name, destination])));
+  }
+
+  get offers() {
+    return this._load({url: `offers`})
+      .then(Api.toJSON)
+      .then((offers) => new Map(offers.map((offer) => [offer.type, offer])));
+  }
+
   updateEvent(event) {
     return this._load({
       url: `tasks/${event.id}`,

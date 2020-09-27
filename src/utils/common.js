@@ -2,19 +2,6 @@ import moment from "moment";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-const generateValue = (range) => {
-  const randomIndex = getRandomInteger(0, range.length - 1);
-
-  return range[randomIndex];
-};
-
 const setNeutralTime = () => {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
@@ -34,6 +21,10 @@ const transformToTime = (time) => {
   return moment(time).format(`HH:mm`);
 };
 
+const transformToDatetime = (date) => {
+  return date.split(`/`).reverse().join(`-`);
+};
+
 const transformToDatetimeAttr = (date) => {
   return moment(date).format(`DD-MM-YY`);
 };
@@ -46,10 +37,6 @@ const generateDurationDHM = (duration) => {
   let minutes = eventDuration.minutes() ? `${eventDuration.minutes()}M` : ``;
 
   return [days, hours, minutes].map((number) => number ? number.padStart(3, `0`) : ``).join(` `).trim();
-};
-
-const transformToDatetime = (date) => {
-  return date.split(`/`).reverse().join(`-`);
 };
 
 const transformToMonthDay = (datetime) => {
@@ -92,6 +79,10 @@ const isEventFuture = (startTime) => {
   return startTime.getTime() > currentDate.getTime();
 };
 
-export {getRandomInteger, generateValue, setNeutralTime, transformToDateAndTime, transformToDatetime,
-  transformToTime, transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
-  sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture, generateId};
+const formatTypeName = (typeToFormat) => {
+  return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
+};
+
+export {generateId, setNeutralTime, transformToDateAndTime, transformToTime, transformToDatetime,
+  transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
+  sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture, formatTypeName};

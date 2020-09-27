@@ -1,7 +1,7 @@
 import flatpickr from "flatpickr";
 import he from "he";
 import SmartView from "./smart.js";
-import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
+import {setNeutralTime, transformToDateAndTime, formatTypeName} from "../utils/common.js";
 import {TRANSFER_TYPES, ACTIVITY_TYPES} from "../const.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
@@ -105,10 +105,6 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
   const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
 
   const isNewEvent = !destination.name;
-
-  const formatTypeName = (typeToFormat) => {
-    return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
-  };
   const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
   const transferTypesTemplate = createEventTypeItemsTemplate(TRANSFER_TYPES, type, formatTypeName);
   const activityTypesTemplate = createEventTypeItemsTemplate(ACTIVITY_TYPES, type, formatTypeName);

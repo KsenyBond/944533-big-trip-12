@@ -1,6 +1,6 @@
 import he from 'he';
 import AbstractView from "./abstract.js";
-import {transformToTime, transformToDatetimeAttr, generateDurationDHM} from "../utils/common.js";
+import {transformToTime, transformToDatetimeAttr, generateDurationDHM, formatTypeName} from "../utils/common.js";
 import {TRANSFER_TYPES, MAX_SHOWN_OFFERS_NUMBER} from "../const.js";
 
 const createEventSelectedOffersTemplate = (offers) => {
@@ -18,9 +18,6 @@ const createEventSelectedOffersTemplate = (offers) => {
 const createEventTemplate = (event) => {
   const {type, destination, startTime, endTime, price, offers} = event;
 
-  const formatTypeName = (typeToFormat) => {
-    return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
-  };
   const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
   const start = transformToTime(startTime);
   const end = transformToTime(endTime);

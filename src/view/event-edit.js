@@ -213,7 +213,7 @@ export default class EventEdit extends SmartView {
   }
 
   get template() {
-    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinationsModel.destination);
+    return createEventEditTemplate(this._data, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
   }
 
   restoreHandlers() {
@@ -265,8 +265,8 @@ export default class EventEdit extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
 
-    const update = this._destinationsModel.destination.has(evt.target.value)
-      ? this._destinationsModel.destination.get(evt.target.value)
+    const update = this._destinationsModel.getDestinations().has(evt.target.value)
+      ? this._destinationsModel.getDestinations().get(evt.target.value)
       : {
         name: ``,
         description: ``,

@@ -1,4 +1,4 @@
-import he from 'he';
+import he from "he";
 import AbstractView from "./abstract.js";
 import {transformToTime, transformToDatetimeAttr, generateDurationDHM, formatTypeName} from "../utils/common.js";
 import {TRANSFER_TYPES, MAX_SHOWN_OFFERS_NUMBER} from "../const.js";

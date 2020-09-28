@@ -8,11 +8,10 @@ export default class Events extends Observer {
 
   setEvents(updateType, events) {
     this._events = events.slice();
-
     this._notify(updateType);
   }
 
-  get events() {
+  getEvents() {
     return this._events.sort((event1, event2) => event1.startTime.getTime() - event2.startTime.getTime());
   }
 

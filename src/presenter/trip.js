@@ -61,8 +61,8 @@ export default class Trip {
   }
 
   _getEvents() {
-    const filterType = this._filterModel.filter;
-    const events = this._eventsModel.events;
+    const filterType = this._filterModel.getFilter();
+    const events = this._eventsModel.getEvents();
     const filteredEvents = filter[filterType](events);
 
     switch (this._currentSortType) {
@@ -125,10 +125,9 @@ export default class Trip {
         this._renderTrip();
         break;
       case UpdateType.INIT:
-        if (!this._destinationsModel.destination || !this._offersModel.offers) {
+        if (!this._destinationsModel.getDestinations() || !this._offersModel.getOffers()) {
           this._isDataAvailable = false;
         }
-
         this._isLoading = false;
         removeElement(this._loadingComponent);
         this._renderTrip();

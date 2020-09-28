@@ -67,4 +67,3 @@ const removeElement = (component) => {
 };
 
 export {RenderPosition, render, createElement, replaceElement, removeElement};
-

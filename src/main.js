@@ -5,19 +5,19 @@ import FilterPresenter from "./presenter/filter.js";
 import EventsModel from "./model/events.js";
 import FilterModel from "./model/filter.js";
 import OffersModel from "./model/offers.js";
-import DestinationsModel from './model/destinations.js';
+import DestinationsModel from "./model/destinations.js";
 import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {MenuItem, FilterType, UpdateType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic hS2ad3bfSwcl1sb2h`;
+const AUTHORIZATION = `Basic hS2sd3bfSysl1nb2h`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
 const siteHeaderControlsElement = siteHeaderMainElement.querySelector(`.trip-main__trip-controls`);
 const siteHeaderControlsHiddenElement = siteHeaderMainElement.querySelector(`.trip-controls .visually-hidden:last-child`);
 const siteItineraryElement = document.querySelector(`.trip-events`);
-const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+const newEventButtonElement = siteHeaderMainElement.querySelector(`.trip-main__event-add-btn`);
 const SiteBodyElement = document.querySelector(`.page-main .page-body__container`);
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -64,7 +64,7 @@ const siteMenuTabsClickHandler = (menuItem) => {
       tripPresenter.destroy();
       removeElement(statisticsComponent);
       resetView(false);
-      statisticsComponent = new StatisticsView(eventsModel.events);
+      statisticsComponent = new StatisticsView(eventsModel.getEvents());
       render(SiteBodyElement, statisticsComponent, RenderPosition.BEFORE_END);
 
       siteItineraryElement.classList.add(`trip-events--hidden`);
@@ -90,31 +90,36 @@ const newEventButtonClickHandler = (evt) => {
   }
 };
 
-newEventButtonElement.addEventListener(`click`, newEventButtonClickHandler);
-
 filterPresenter.init();
 tripPresenter.init();
 
-api.events
-  .then((events) => {
-    eventsModel.setEvents(UpdateType.INIT, events);
-    render(siteHeaderControlsElement, siteMenuTabsComponent, RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
-    siteMenuTabsComponent.setMenuTabsClickHandler(siteMenuTabsClickHandler);
-    filterPresenter.init();
-  })
-  .catch(() => {
-    eventsModel.setEvents(UpdateType.INIT, []);
-    render(siteHeaderControlsElement, siteMenuTabsComponent, RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
-    siteMenuTabsComponent.setMenuTabsClickHandler(siteMenuTabsClickHandler);
-    filterPresenter.init();
-  });
+newEventButtonElement.addEventListener(`click`, newEventButtonClickHandler);
 
-api.destination
-  .then((destination) => {
-    destinationsModel.destination = destination;
-  });
+const prepareTabsAndFilters = () => {
+  render(siteHeaderControlsElement, siteMenuTabsComponent, RenderPosition.BEFORE_ELEMENT, siteHeaderControlsHiddenElement);
+  siteMenuTabsComponent.setMenuTabsClickHandler(siteMenuTabsClickHandler);
+  filterPresenter.init();
+};
 
-api.offers
-  .then((offers) => {
-    offersModel.offers = offers;
-  });
+const setData = async () => {
+  const destinationsLoaded = await api.getDestination()
+    .then((destination) => {
+      destinationsModel.setDestinations(destination);
+    });
+  const offersLoaded = await api.getOffers()
+    .then((offers) => {
+      offersModel.setOffers(offers);
+    });
+  const eventsLoaded = await api.getEvents()
+    .then((events) => {
+      eventsModel.setEvents(UpdateType.INIT, events);
+      prepareTabsAndFilters();
+    })
+    .catch(() => {
+      eventsModel.setEvents(UpdateType.INIT, []);
+      prepareTabsAndFilters();
+    });
+};
+
+setData();
+

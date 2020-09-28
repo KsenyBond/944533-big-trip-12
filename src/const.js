@@ -1,9 +1,7 @@
-const TRANSFER_TYPES_NUMBER = 7;
 const MAX_SHOWN_OFFERS_NUMBER = 3;
 
-const EVENT_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
-const TRANSFER_TYPES = EVENT_TYPES.slice(0, TRANSFER_TYPES_NUMBER);
-const ACTIVITY_TYPES = EVENT_TYPES.slice(TRANSFER_TYPES_NUMBER);
+const TRANSFER_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+const ACTIVITY_TYPES = [`check-in`, `sightseeing`, `restaurant`];
 
 const SortType = {
   EVENT: `event`,
@@ -34,5 +32,5 @@ const MenuItem = {
   STATS: `Stats`
 };
 
-export {MAX_SHOWN_OFFERS_NUMBER, EVENT_TYPES, TRANSFER_TYPES, ACTIVITY_TYPES, SortType, UserAction,
+export {MAX_SHOWN_OFFERS_NUMBER, TRANSFER_TYPES, ACTIVITY_TYPES, SortType, UserAction,
   UpdateType, FilterType, MenuItem};

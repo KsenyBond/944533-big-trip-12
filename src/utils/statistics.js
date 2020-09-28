@@ -12,7 +12,7 @@ const divideCostsByTypes = (events) => {
 };
 
 const divideByTransportTypes = (events) => {
-  const transferTypes = Object.assign([], TRANSFER_TYPES);
+  const [...transferTypes] = TRANSFER_TYPES;
 
   return transferTypes
     .map((type) => {

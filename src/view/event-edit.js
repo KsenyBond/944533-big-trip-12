@@ -147,7 +147,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             ${formatTypeName(type)} ${preposition}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
-          name="event-destination" value="${destination.name}" list="destination-list-1">
+          name="event-destination" value="${destination.name}" list="destination-list-1" required>
           <datalist id="destination-list-1">
             ${destinationTemplate}
           </datalist>
@@ -172,7 +172,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}" required>
         </div>
         ${buttonsTemplate}
       </header>

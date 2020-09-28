@@ -1,4 +1,3 @@
-const TRANSFER_TYPES_NUMBER = 7;
 const MINUTES_IN_DAY = 1440;
 const MIN_NUMBER = 0;
 const MAX_AVAILABLE_OFFERS_NUMBER = 5;
@@ -9,10 +8,8 @@ const DESTINATION_PHOTOS = 5;
 const MAX_DAYS_GAP = 1;
 
 const EVENT_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
-
-const TRANSFER_TYPES = EVENT_TYPES.slice(0, TRANSFER_TYPES_NUMBER);
-
-const ACTIVITY_TYPES = EVENT_TYPES.slice(TRANSFER_TYPES_NUMBER);
+const TRANSFER_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+const ACTIVITY_TYPES = [`check-in`, `sightseeing`, `restaurant`];
 
 const EVENT_OFFERS = [`Add meal`, `Switch to comfort`, `Choose seats`, `Travel by train`, `Book tickets`, `Lunch in city`, `Rent a car`];
 

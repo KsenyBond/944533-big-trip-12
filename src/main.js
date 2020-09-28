@@ -10,14 +10,14 @@ import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {MenuItem, FilterType, UpdateType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2h`;
+const AUTHORIZATION = `Basic hS2sd3dfSwcl1va2h`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
 const siteHeaderControlsElement = siteHeaderMainElement.querySelector(`.trip-main__trip-controls`);
 const siteHeaderControlsHiddenElement = siteHeaderMainElement.querySelector(`.trip-controls .visually-hidden:last-child`);
 const siteItineraryElement = document.querySelector(`.trip-events`);
-const newEventButtonElement = document.querySelector(`.trip-main__event-add-btn`);
+const newEventButtonElement = siteHeaderMainElement.querySelector(`.trip-main__event-add-btn`);
 const SiteBodyElement = document.querySelector(`.page-main .page-body__container`);
 
 const api = new Api(END_POINT, AUTHORIZATION);

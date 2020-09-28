@@ -2,20 +2,16 @@ import flatpickr from "flatpickr";
 import he from "he";
 import SmartView from "./smart.js";
 import {setNeutralTime, transformToDateAndTime} from "../utils/common.js";
-import {MAX_SELECTED_OFFERS_NUMBER, TRANSFER_TYPES, EVENT_TYPES} from "../const.js";
+import {TRANSFER_TYPES, ACTIVITY_TYPES} from "../const.js";
 
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 const BLANK_EVENT = {
-  type: {
-    name: `Flight`,
-    transfer: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
-    activity: [`Check-in`, `Sightseeing`, `Restaurant`],
-  },
+  type: `flight`,
   destination: {
-    place: ``,
+    name: ``,
     description: ``,
-    photos: ``,
+    pictures: []
   },
   startTime: setNeutralTime(),
   endTime: setNeutralTime(),
@@ -30,12 +26,12 @@ const FLATPICKR_OPTIONS = {
   'time_24hr': true,
 };
 
-const createEventTypeItemsTemplate = (typesList, currentType) => {
+const createEventTypeItemsTemplate = (typesList, currentType, formatTypeName) => {
   return typesList.map((type) =>
     `<div class="event__type-item">
-      <input id="event-type-${type.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio"
-      name="event-type" value="${type.toLowerCase()}" data-type="${type}" ${currentType === type ? `checked` : ``}>
-      <label class="event__type-label  event__type-label--${type.toLowerCase()}" for="event-type-${type.toLowerCase()}-1">${type}</label>
+      <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio"
+      name="event-type" value="${type}" ${currentType === type ? `checked` : ``}>
+      <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${formatTypeName(type)}</label>
     </div>`).join(``);
 };
 
@@ -88,18 +84,18 @@ const createAvailableOffersTemplate = (availableOffers, selectedOffers, type) =>
 };
 
 const createDestinationTemplate = (possibleDestinations) => {
-  return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.place}"></option>`).join(``);
+  return Array.from(possibleDestinations.values()).map((destination) => `<option value="${destination.name}"></option>`).join(``);
 };
 
 const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinations) => {
   return `${!isNewEvent ?
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${possibleDestinations.get(destination.place).description}</p>
+      <p class="event__destination-description">${possibleDestinations.get(destination.name).description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${possibleDestinations.get(destination.place).photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${possibleDestinations.get(destination.name).pictures.map((photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`).join(``)}
         </div>
       </div>
     </section>` : ``}`;
@@ -108,17 +104,18 @@ const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinat
 const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
   const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
 
-  const isNewEvent = !destination.place;
+  const isNewEvent = !destination.name;
 
-  const typeName = type.name;
-  const preposition = type.transfer.includes(typeName) ? `to` : `in`;
-  const iconType = typeName.toLowerCase();
-  const transferTypesTemplate = createEventTypeItemsTemplate(type.transfer, type.name);
-  const activityTypesTemplate = createEventTypeItemsTemplate(type.activity, type.name);
+  const formatTypeName = (typeToFormat) => {
+    return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
+  };
+  const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
+  const transferTypesTemplate = createEventTypeItemsTemplate(TRANSFER_TYPES, type, formatTypeName);
+  const activityTypesTemplate = createEventTypeItemsTemplate(ACTIVITY_TYPES, type, formatTypeName);
   const start = transformToDateAndTime(startTime);
   const end = transformToDateAndTime(endTime);
   const buttonsTemplate = createButtonsTemplate(isNewEvent, isFavorite);
-  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type.name);
+  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type);
   const destinationTemplate = createDestinationTemplate(possibleDestinations);
   const destinationInfoTemplate = createDestinationInfoTemplate(isNewEvent, destination, possibleDestinations);
 
@@ -128,7 +125,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${iconType}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -147,10 +144,10 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-            ${typeName} ${preposition}
+            ${formatTypeName(type)} ${preposition}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
-          name="event-destination" value="${destination.place}" list="destination-list-1">
+          name="event-destination" value="${destination.name}" list="destination-list-1" required>
           <datalist id="destination-list-1">
             ${destinationTemplate}
           </datalist>
@@ -175,7 +172,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}" required>
         </div>
         ${buttonsTemplate}
       </header>
@@ -189,9 +186,9 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 };
 
 export default class EventEdit extends SmartView {
-  constructor(destinations, offersModel, event = BLANK_EVENT) {
+  constructor(destinationsModel, offersModel, event = BLANK_EVENT) {
     super();
-    this._destinations = destinations;
+    this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
     this._data = EventEdit.parseEventToData(event);
     this._startDatepicker = null;
@@ -212,7 +209,7 @@ export default class EventEdit extends SmartView {
   }
 
   get template() {
-    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinations);
+    return createEventEditTemplate(this._data, this._offersModel.offers, this._destinationsModel.destination);
   }
 
   restoreHandlers() {
@@ -256,11 +253,7 @@ export default class EventEdit extends SmartView {
   _eventTypeChangeHandler(evt) {
     evt.preventDefault();
     this.updateData({
-      type: {
-        name: evt.target.dataset.type,
-        transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
-        activity: EVENT_TYPES.slice(TRANSFER_TYPES),
-      },
+      type: evt.target.value,
       offers: []
     });
   }
@@ -268,12 +261,12 @@ export default class EventEdit extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
 
-    const update = this._destinations.has(evt.target.value)
-      ? this._destinations.get(evt.target.value)
+    const update = this._destinationsModel.destination.has(evt.target.value)
+      ? this._destinationsModel.destination.get(evt.target.value)
       : {
-        place: ``,
+        name: ``,
         description: ``,
-        photos: ``,
+        pictures: []
       };
 
     this.updateData({
@@ -297,12 +290,10 @@ export default class EventEdit extends SmartView {
     let update = this._data.offers.slice();
 
     if (evt.target.checked) {
-      if (this._data.offers.length < MAX_SELECTED_OFFERS_NUMBER) {
-        update.push({
-          title: evt.target.dataset.title,
-          price: Number(evt.target.dataset.price)
-        });
-      }
+      update.push({
+        title: evt.target.dataset.title,
+        price: Number(evt.target.dataset.price)
+      });
     } else {
       update = update.filter((offer) => offer.title !== evt.target.dataset.title);
     }

@@ -1,14 +1,14 @@
 import {getRandomInteger, generateValue} from "../utils/common.js";
 import {EVENT_TYPES, EVENT_OFFERS, MIN_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER, MIN_OFFER_PRICE, MAX_OFFER_PRICE} from "../const.js";
 
+const availableOffers = new Map();
+
 const EVENT_OFFERS_LIST = EVENT_OFFERS.map(function (offer) {
   return {
     title: offer,
     price: getRandomInteger(MIN_OFFER_PRICE, MAX_OFFER_PRICE)
   };
 });
-
-const availableOffers = new Map();
 
 EVENT_TYPES.forEach((type) => {
   let uniqueOffers = new Set();

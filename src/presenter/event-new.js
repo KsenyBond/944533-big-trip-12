@@ -1,15 +1,14 @@
 import EventEditView from "../view/event-edit.js";
-import {generateId} from "../mock/event.js";
+import {generateId} from "../utils/common.js";
 import {render, RenderPosition, removeElement, replaceElement} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
 export default class EventNew {
-  constructor(tripEventsContainer, handleEventChange, noEventsComponent, currentEvents, destinations, offersModel) {
+  constructor(tripEventsContainer, handleEventChange, noEventsComponent, destinationsModel, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._handleEventChange = handleEventChange;
     this._noEventsComponent = noEventsComponent;
-    this._currentEvents = currentEvents;
-    this._destinations = destinations;
+    this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
 
     this._eventEditComponent = null;
@@ -20,15 +19,16 @@ export default class EventNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(tripDaysComponent, eventNewFormCloseHandler) {
+  init(tripDaysComponent, eventNewFormCloseHandler, currentEvents) {
+    this._tripDaysComponent = tripDaysComponent;
     this._destroyCallback = eventNewFormCloseHandler;
+    this._currentEvents = currentEvents;
 
     if (this._eventEditComponent !== null) {
       return;
     }
 
-    this._tripDaysComponent = tripDaysComponent;
-    this._eventEditComponent = new EventEditView(this._destinations, this._offersModel);
+    this._eventEditComponent = new EventEditView(this._destinationsModel, this._offersModel);
 
     this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);

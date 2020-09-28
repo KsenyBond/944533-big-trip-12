@@ -1,43 +1,9 @@
 import {availableOffers} from "./offer.js";
+import {destinations} from "./destination.js";
 import {getRandomInteger, generateValue} from "../utils/common.js";
-import {TRANSFER_TYPES, MINUTES_IN_DAY, MAX_SELECTED_OFFERS_NUMBER,
-  DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION} from "../const.js";
+import {MINUTES_IN_DAY, MAX_DAYS_GAP, EVENT_TYPES} from "../const.js";
 
 const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
-const generateType = () => {
-  return {
-    name: generateValue(EVENT_TYPES),
-    transfer: EVENT_TYPES.slice(0, TRANSFER_TYPES),
-    activity: EVENT_TYPES.slice(TRANSFER_TYPES),
-  };
-};
-
-const destinations = new Map();
-
-const generateRandomDescription = () => {
-  const getRandomDescription = () => {
-    return DESTINATION_DESCRIPTION[getRandomInteger(0, DESTINATION_DESCRIPTION.length - 1)];
-  };
-  const destinationDescription =
-      new Array(getRandomInteger(1, 5))
-          .fill()
-          .map(getRandomDescription);
-  const uniqueDestinationDescription = new Set(destinationDescription);
-
-  return Array.from(uniqueDestinationDescription).join(` `);
-};
-
-const generateRandomPhotos = () => {
-  return `http://picsum.photos/248/152?r=${Math.random()}`;
-};
-
-EVENT_DESTINATIONS.forEach((place) => {
-  const description = generateRandomDescription();
-  const photos = new Array(DESTINATION_PHOTOS).fill().map(generateRandomPhotos);
-
-  destinations.set(place, {place, description, photos});
-});
 
 const generateStartTime = () => {
   const daysGap = getRandomInteger(-MAX_DAYS_GAP, MAX_DAYS_GAP);
@@ -62,15 +28,13 @@ const generateEndTime = (start) => {
 };
 
 const generateOffers = (type, offersList) => {
-  const typeMatchingOffers = offersList.find((element) => element.type === type.name).offers;
+  const typeMatchingOffers = offersList.find((element) => element.type === type).offers;
 
   const selectedOffers = [];
 
   for (const offer of typeMatchingOffers) {
-    if (selectedOffers.length < MAX_SELECTED_OFFERS_NUMBER) {
-      if (getRandomInteger(0, 1)) {
-        selectedOffers.push(offer);
-      }
+    if (getRandomInteger(0, 1)) {
+      selectedOffers.push(offer);
     }
   }
 
@@ -79,7 +43,7 @@ const generateOffers = (type, offersList) => {
 
 const generateEvent = () => {
   const id = generateId();
-  const type = generateType();
+  const type = generateValue(EVENT_TYPES);
   const destination = generateValue(Array.from(destinations.values()));
   const startTime = generateStartTime();
   const endTime = generateEndTime(startTime);
@@ -98,4 +62,4 @@ const generateEvent = () => {
   };
 };
 
-export {generateId, generateEvent, generateOffers, destinations};
+export {generateId, generateEvent, generateOffers};

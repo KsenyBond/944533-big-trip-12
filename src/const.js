@@ -1,15 +1,15 @@
-const TRANSFER_TYPES = 7;
 const MINUTES_IN_DAY = 1440;
 const MIN_NUMBER = 0;
-const MAX_SELECTED_OFFERS_NUMBER = 3;
 const MAX_AVAILABLE_OFFERS_NUMBER = 5;
+const MAX_SHOWN_OFFERS_NUMBER = 3;
 const MIN_OFFER_PRICE = 10;
 const MAX_OFFER_PRICE = 30;
 const DESTINATION_PHOTOS = 5;
 const MAX_DAYS_GAP = 1;
-const EVENTS_NUMBER = 15;
 
-const EVENT_TYPES = [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`, `Check-in`, `Sightseeing`, `Restaurant`];
+const EVENT_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+const TRANSFER_TYPES = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+const ACTIVITY_TYPES = [`check-in`, `sightseeing`, `restaurant`];
 
 const EVENT_OFFERS = [`Add meal`, `Switch to comfort`, `Choose seats`, `Travel by train`, `Book tickets`, `Lunch in city`, `Rent a car`];
 
@@ -47,7 +47,8 @@ const UserAction = {
 
 const UpdateType = {
   MINOR: `MINOR`,
-  MAJOR: `MAJOR`
+  MAJOR: `MAJOR`,
+  INIT: `INIT`
 };
 
 const FilterType = {
@@ -61,6 +62,6 @@ const MenuItem = {
   STATS: `Stats`
 };
 
-export {TRANSFER_TYPES, EVENT_OFFERS, MINUTES_IN_DAY, MIN_NUMBER, MAX_SELECTED_OFFERS_NUMBER, MAX_AVAILABLE_OFFERS_NUMBER,
-  MIN_OFFER_PRICE, MAX_OFFER_PRICE, DESTINATION_PHOTOS, MAX_DAYS_GAP, EVENTS_NUMBER, SortType, EVENT_TYPES,
-  EVENT_DESTINATIONS, DESTINATION_DESCRIPTION, UserAction, UpdateType, FilterType, MenuItem};
+export {TRANSFER_TYPES, ACTIVITY_TYPES, EVENT_OFFERS, MINUTES_IN_DAY, MIN_NUMBER, MAX_SHOWN_OFFERS_NUMBER,
+  MAX_AVAILABLE_OFFERS_NUMBER, MIN_OFFER_PRICE, MAX_OFFER_PRICE, DESTINATION_PHOTOS, MAX_DAYS_GAP,
+  SortType, EVENT_TYPES, EVENT_DESTINATIONS, DESTINATION_DESCRIPTION, UserAction, UpdateType, FilterType, MenuItem};

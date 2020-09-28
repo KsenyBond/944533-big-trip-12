@@ -37,7 +37,7 @@ export default class Trip {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
-    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._noEventsComponent, this._destinationsModel, this._offersModel);
+    this._eventNewPresenter = new EventNewPresenter(this._tripEventsContainer, this._handleViewAction, this._destinationsModel, this._offersModel);
   }
 
   init() {
@@ -57,7 +57,7 @@ export default class Trip {
   }
 
   createEvent(eventNewFormCloseHandler) {
-    this._eventNewPresenter.init(this._tripDaysComponent, eventNewFormCloseHandler, this._getEvents());
+    this._eventNewPresenter.init(this._tripDaysComponent, eventNewFormCloseHandler, this._getEvents(), this._noEventsComponent);
   }
 
   _getEvents() {
@@ -224,6 +224,7 @@ export default class Trip {
   }
 
   _renderNoEvents() {
+    this._noEventsComponent = new NoEventsView(this._isDataAvailable);
     render(this._tripEventsContainer, this._noEventsComponent, RenderPosition.BEFORE_END);
   }
 

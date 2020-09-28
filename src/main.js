@@ -10,7 +10,7 @@ import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {MenuItem, FilterType, UpdateType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic hS2sd3ddSwcl1sy2h`;
+const AUTHORIZATION = `Basic hS2ad3bfSwcl1sb2h`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);
@@ -51,6 +51,7 @@ const resetView = (toDefault = true) => {
 const siteMenuTabsClickHandler = (menuItem) => {
   switch (menuItem) {
     case MenuItem.TABLE:
+      tripPresenter.destroy();
       removeElement(statisticsComponent);
       resetView();
       tripPresenter.init();

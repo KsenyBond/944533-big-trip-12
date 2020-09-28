@@ -3,10 +3,9 @@ import {render, RenderPosition, removeElement, replaceElement} from "../utils/re
 import {UserAction, UpdateType} from "../const.js";
 
 export default class EventNew {
-  constructor(tripEventsContainer, handleEventChange, noEventsComponent, destinationsModel, offersModel) {
+  constructor(tripEventsContainer, handleEventChange, destinationsModel, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._handleEventChange = handleEventChange;
-    this._noEventsComponent = noEventsComponent;
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
 
@@ -18,10 +17,11 @@ export default class EventNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(tripDaysComponent, eventNewFormCloseHandler, currentEvents) {
+  init(tripDaysComponent, eventNewFormCloseHandler, currentEvents, noEventsComponent) {
     this._tripDaysComponent = tripDaysComponent;
     this._destroyCallback = eventNewFormCloseHandler;
     this._currentEvents = currentEvents;
+    this._noEventsComponent = noEventsComponent;
 
     if (this._eventEditComponent !== null) {
       return;
@@ -90,6 +90,11 @@ export default class EventNew {
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
+
+      if (!this._currentEvents.length) {
+        replaceElement(this._noEventsComponent, this._eventEditComponent);
+      }
+
       this.destroy();
     }
   }

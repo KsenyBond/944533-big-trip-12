@@ -5,7 +5,7 @@ import TripDayCounterView from "../view/day-counter.js";
 import TripEventsListView from "../view/trip-events-list.js";
 import NoEventsView from "../view/no-events.js";
 import LoadingView from "../view/loading.js";
-import EventPresenter from "./event.js";
+import EventPresenter, {State as EventPresenterViewState} from "./event.js";
 import EventNewPresenter from "./event-new.js";
 import {render, RenderPosition, removeElement} from "../utils/render.js";
 import {sortTimeDown, sortPriceDown, transformToLocaleDate} from "../utils/common.js";
@@ -85,15 +85,28 @@ export default class Trip {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this._api.updateEvent(update).then((response) => {
-          this._eventsModel.updateEvent(updateType, response);
-        });
+        this._eventsPresenter[update.id].setViewState(EventPresenterViewState.SAVING);
+        this._api.updateEvent(update)
+          .then((response) => this._eventsModel.updateEvent(updateType, response))
+          .catch(() => {
+            this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
         break;
       case UserAction.ADD_EVENT:
-        this._eventsModel.addEvent(updateType, update);
+        this._eventNewPresenter.setSaving();
+        this._api.addEvent(update)
+          .then((response) => this._eventsModel.addEvent(updateType, response))
+          .catch(() => {
+            this._eventNewPresenter.setAborting();
+          });
         break;
       case UserAction.DELETE_EVENT:
-        this._eventsModel.deleteEvent(updateType, update);
+        this._eventsPresenter[update.id].setViewState(EventPresenterViewState.DELETING);
+        this._api.deleteEvent(update)
+          .then(() => this._eventsModel.deleteEvent(updateType, update))
+          .catch(() => {
+            this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
         break;
     }
   }

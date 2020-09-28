@@ -1,5 +1,4 @@
 import EventEditView from "../view/event-edit.js";
-import {generateId} from "../utils/common.js";
 import {render, RenderPosition, removeElement, replaceElement} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
@@ -56,11 +55,30 @@ export default class EventNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._eventEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._eventEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._eventEditComponent.shake(resetFormState);
+  }
+
   _formSubmitHandler(event) {
     this._handleEventChange(
         UserAction.ADD_EVENT,
         UpdateType.MAJOR,
-        Object.assign({id: generateId()}, event)
+        event
     );
     this.destroy();
   }

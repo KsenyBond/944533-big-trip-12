@@ -10,7 +10,7 @@ import {render, RenderPosition, removeElement} from "./utils/render.js";
 import {MenuItem, FilterType, UpdateType} from "./const.js";
 import Api from "./api.js";
 
-const AUTHORIZATION = `Basic hS2sd3dfSwcl1sa2h`;
+const AUTHORIZATION = `Basic hS2sd3ddSwcl1sy2h`;
 const END_POINT = `https://12.ecmascript.pages.academy/big-trip/`;
 
 const siteHeaderMainElement = document.querySelector(`.trip-main`);

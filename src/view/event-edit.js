@@ -26,7 +26,7 @@ const FLATPICKR_OPTIONS = {
   'time_24hr': true,
 };
 
-const createEventTypeItemsTemplate = (typesList, currentType, formatTypeName) => {
+const createEventTypeItemsTemplate = (typesList, currentType) => {
   return typesList.map((type) =>
     `<div class="event__type-item">
       <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio"
@@ -35,13 +35,17 @@ const createEventTypeItemsTemplate = (typesList, currentType, formatTypeName) =>
     </div>`).join(``);
 };
 
-const createButtonsTemplate = (isNewEvent, isFavorite) => {
-  const isChecked = isFavorite ? `checked` : ``;
-
-  return `<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+const createButtonsTemplate = (isNewEvent, isFavorite, isSaving, isDeleting, isDisabled) => {
+  return `
+    <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? `disabled` : ``}>
+      ${isSaving ? `Saving...` : `Save`}
+    </button>
     ${!isNewEvent ?
-    `<button class="event__reset-btn" type="reset">Delete</button>
-     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isChecked}>
+    `<button class="event__reset-btn" type="reset" ${isDisabled ? `disabled` : ``}>
+      ${isDeleting ? `Deleting...` : `Delete`}
+    </button>
+     <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox"
+     name="event-favorite" ${isFavorite ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -49,13 +53,13 @@ const createButtonsTemplate = (isNewEvent, isFavorite) => {
         </svg>
       </label>
 
-      <button class="event__rollup-btn" type="button">
+      <button class="event__rollup-btn" type="button" ${isDisabled ? `disabled` : ``}>
         <span class="visually-hidden">Open event</span>
       </button>`
     : `<button class="event__reset-btn" type="reset">Cancel</button>`}`;
 };
 
-const createAvailableOffersTemplate = (availableOffers, selectedOffers, type) => {
+const createAvailableOffersTemplate = (availableOffers, selectedOffers, type, isDisabled) => {
   const availableOffersList = availableOffers.get(type).offers.map((offer) => {
     const id = offer.title.toLowerCase().split(` `).join(`-`);
     const isChecked = selectedOffers.some((selectedOffer) => selectedOffer.title === offer.title) ? `checked` : ``;
@@ -63,7 +67,8 @@ const createAvailableOffersTemplate = (availableOffers, selectedOffers, type) =>
     return (
       `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${id}-1"
-      type="checkbox" name="event-offer-${id}" data-title="${offer.title}" data-price="${offer.price}" ${isChecked}>
+      type="checkbox" name="event-offer-${id}" data-title="${offer.title}" data-price="${offer.price}"
+        ${isChecked} ${isDisabled ? `disabled` : ``}>
       <label class="event__offer-label" for="event-offer-${id}-1">
         <span class="event__offer-title">${offer.title}</span>
         &plus;
@@ -102,7 +107,8 @@ const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinat
 };
 
 const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
-  const {type, destination, startTime, endTime, price, offers: selectedOffers, isFavorite} = data;
+  const {type, destination, startTime, endTime, price, offers: selectedOffers,
+    isFavorite, isDisabled, isSaving, isDeleting} = data;
 
   const isNewEvent = !destination.name;
   const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
@@ -110,8 +116,8 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
   const activityTypesTemplate = createEventTypeItemsTemplate(ACTIVITY_TYPES, type, formatTypeName);
   const start = transformToDateAndTime(startTime);
   const end = transformToDateAndTime(endTime);
-  const buttonsTemplate = createButtonsTemplate(isNewEvent, isFavorite);
-  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type);
+  const buttonsTemplate = createButtonsTemplate(isNewEvent, isFavorite, isSaving, isDeleting, isDisabled);
+  const availableOffersTemplate = createAvailableOffersTemplate(availableOffers, selectedOffers, type, isDisabled);
   const destinationTemplate = createDestinationTemplate(possibleDestinations);
   const destinationInfoTemplate = createDestinationInfoTemplate(isNewEvent, destination, possibleDestinations);
 
@@ -123,7 +129,7 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -143,7 +149,8 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             ${formatTypeName(type)} ${preposition}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text"
-          name="event-destination" value="${destination.name}" list="destination-list-1">
+          name="event-destination" value="${destination.name}" list="destination-list-1"
+          ${isDisabled ? `disabled` : ``} required>
           <datalist id="destination-list-1">
             ${destinationTemplate}
           </datalist>
@@ -154,13 +161,13 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             From
           </label>
           <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time"
-          value="${start}">
+          value="${start}" ${isDisabled ? `disabled` : ``}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">
             To
           </label>
           <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time"
-          value="${end}">
+          value="${end}" ${isDisabled ? `disabled` : ``}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -168,7 +175,8 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${he.encode(price.toString())}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price"
+          value="${he.encode(price.toString())}" ${isDisabled ? `disabled` : ``} required>
         </div>
         ${buttonsTemplate}
       </header>
@@ -386,10 +394,24 @@ export default class EventEdit extends SmartView {
   }
 
   static parseEventToData(event) {
-    return Object.assign({}, event);
+    return Object.assign(
+        {},
+        event,
+        {
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        }
+    );
   }
 
   static parseDataToEvent(data) {
-    return Object.assign({}, data);
+    data = Object.assign({}, data);
+
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   }
 }

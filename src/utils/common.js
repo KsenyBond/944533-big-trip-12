@@ -1,7 +1,5 @@
 import moment from "moment";
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
-
 const setNeutralTime = () => {
   const currentDate = new Date();
   currentDate.setHours(0, 0, 0, 0);
@@ -59,14 +57,6 @@ const sortPriceDown = (taskA, taskB) => {
   return taskB.price - taskA.price;
 };
 
-const isDatesEqual = (dateA, dateB) => {
-  if (dateA === null && dateB === null) {
-    return true;
-  }
-
-  return moment(dateA).isSame(dateB, `day`);
-};
-
 const isEventPast = (endTime) => {
   const currentDate = new Date();
 
@@ -83,6 +73,6 @@ const formatTypeName = (typeToFormat) => {
   return typeToFormat[0].toUpperCase() + typeToFormat.slice(1);
 };
 
-export {generateId, setNeutralTime, transformToDateAndTime, transformToTime, transformToDatetime,
-  transformToDatetimeAttr, generateDurationDHM, transformToMonthDay, transformToLocaleDate,
-  sortTimeDown, sortPriceDown, isDatesEqual, isEventPast, isEventFuture, formatTypeName};
+export {setNeutralTime, transformToDateAndTime, transformToTime, transformToDatetime, transformToDatetimeAttr,
+  generateDurationDHM, transformToMonthDay, transformToLocaleDate, sortTimeDown, sortPriceDown, isEventPast,
+  isEventFuture, formatTypeName};

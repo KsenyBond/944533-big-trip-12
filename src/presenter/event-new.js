@@ -1,13 +1,11 @@
 import EventEditView from "../view/event-edit.js";
-import {generateId} from "../utils/common.js";
 import {render, RenderPosition, removeElement, replaceElement} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 
 export default class EventNew {
-  constructor(tripEventsContainer, handleEventChange, noEventsComponent, destinationsModel, offersModel) {
+  constructor(tripEventsContainer, handleEventChange, destinationsModel, offersModel) {
     this._tripEventsContainer = tripEventsContainer;
     this._handleEventChange = handleEventChange;
-    this._noEventsComponent = noEventsComponent;
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
 
@@ -19,10 +17,11 @@ export default class EventNew {
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
-  init(tripDaysComponent, eventNewFormCloseHandler, currentEvents) {
+  init(tripDaysComponent, eventNewFormCloseHandler, currentEvents, noEventsComponent) {
     this._tripDaysComponent = tripDaysComponent;
     this._destroyCallback = eventNewFormCloseHandler;
     this._currentEvents = currentEvents;
+    this._noEventsComponent = noEventsComponent;
 
     if (this._eventEditComponent !== null) {
       return;
@@ -56,13 +55,31 @@ export default class EventNew {
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._eventEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._eventEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._eventEditComponent.shake(resetFormState);
+  }
+
   _formSubmitHandler(event) {
     this._handleEventChange(
         UserAction.ADD_EVENT,
         UpdateType.MAJOR,
-        Object.assign({id: generateId()}, event)
+        event
     );
-    this.destroy();
   }
 
   _deleteClickHandler() {
@@ -72,6 +89,11 @@ export default class EventNew {
   _escKeyDownHandler(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
+
+      if (!this._currentEvents.length) {
+        replaceElement(this._noEventsComponent, this._eventEditComponent);
+      }
+
       this.destroy();
     }
   }

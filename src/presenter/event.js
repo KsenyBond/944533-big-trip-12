@@ -1,12 +1,17 @@
 import EventView from "../view/event.js";
 import EventEditView from "../view/event-edit.js";
 import {render, RenderPosition, replaceElement, removeElement} from "../utils/render.js";
-import {isDatesEqual} from "../utils/common.js";
 import {UserAction, UpdateType} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
   EDITING: `EDITING`
+};
+
+const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`
 };
 
 export default class Event {
@@ -53,10 +58,40 @@ export default class Event {
 
     if (this._mode === Mode.EDITING) {
       replaceElement(this._eventEditComponent, prevEventEditComponent);
+      this._mode = Mode.DEFAULT;
     }
 
     removeElement(prevEventComponent);
     removeElement(prevEventEditComponent);
+  }
+
+  setViewState(state) {
+    const resetFormState = () => {
+      this._eventEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._eventEditComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._eventComponent.shake(resetFormState);
+        this._eventEditComponent.shake(resetFormState);
+        break;
+    }
   }
 
   _replaceEventToEditForm() {
@@ -91,16 +126,11 @@ export default class Event {
   }
 
   _formSubmitHandler(event) {
-    const isMinorUpdate = isDatesEqual(this._event.startTime, event.startTime)
-      && isDatesEqual(this._event.endTime, event.endTime)
-      && this._event.price === event.price;
-
     this._handleEventChange(
         UserAction.UPDATE_EVENT,
-        isMinorUpdate ? UpdateType.MINOR : UpdateType.MAJOR,
+        UpdateType.MAJOR,
         event
     );
-    this._replaceEditFormToEvent();
   }
 
   _deleteClickHandler(event) {
@@ -130,3 +160,5 @@ export default class Event {
     removeElement(this._eventEditComponent);
   }
 }
+
+export {State};

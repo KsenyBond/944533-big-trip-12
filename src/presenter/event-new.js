@@ -80,7 +80,6 @@ export default class EventNew {
         UpdateType.MAJOR,
         event
     );
-    this.destroy();
   }
 
   _deleteClickHandler() {

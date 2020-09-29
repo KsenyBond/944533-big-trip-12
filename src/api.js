@@ -47,7 +47,7 @@ export default class Api {
       .then(EventsModel.adaptToClient);
   }
 
-  addEvent(event) {
+  addNewEvent(event) {
     return this._load({
       url: `points`,
       method: Method.POST,

@@ -41,9 +41,9 @@ const transformToDatetimeAttr = (date) => {
 const generateDurationDHM = (duration) => {
   const eventDuration = moment.duration(duration);
 
-  let days = eventDuration.days() ? `${eventDuration.days()}D` : ``;
-  let hours = eventDuration.hours() ? `${eventDuration.hours()}H` : ``;
-  let minutes = eventDuration.minutes() ? `${eventDuration.minutes()}M` : ``;
+  const days = eventDuration.days() ? `${eventDuration.days()}D` : ``;
+  const hours = eventDuration.hours() ? `${eventDuration.hours()}H` : ``;
+  const minutes = eventDuration.minutes() ? `${eventDuration.minutes()}M` : ``;
 
   return [days, hours, minutes].map((number) => number ? number.padStart(3, `0`) : ``).join(` `).trim();
 };

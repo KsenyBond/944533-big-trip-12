@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from "moment";
 import {TRANSFER_TYPES} from "../const.js";
 
 const divideCostsByTypes = (events) => {

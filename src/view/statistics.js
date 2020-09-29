@@ -1,7 +1,7 @@
 import Chart from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import SmartView from "./smart.js";
-import {divideCostsByTypes, divideByTransportTypes, divideDurationsByTypes} from '../utils/statistics.js';
+import {divideCostsByTypes, divideByTransportTypes, divideDurationsByTypes} from "../utils/statistics.js";
 
 const BAR_HEIGHT = 55;
 

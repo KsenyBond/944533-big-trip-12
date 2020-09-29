@@ -1,8 +1,10 @@
-import EventsModel from './model/events.js';
+import EventsModel from "./model/events.js";
 
 const Method = {
   GET: `GET`,
-  PUT: `PUT`
+  PUT: `PUT`,
+  POST: `POST`,
+  DELETE: `DELETE`
 };
 
 const SuccessHTTPStatusRange = {
@@ -16,19 +18,19 @@ export default class Api {
     this._authorization = authorization;
   }
 
-  get events() {
+  getEvents() {
     return this._load({url: `points`})
       .then(Api.toJSON)
       .then((events) => events.map(EventsModel.adaptToClient));
   }
 
-  get destination() {
+  getDestination() {
     return this._load({url: `destinations`})
       .then(Api.toJSON)
       .then((destinations) => new Map(destinations.map((destination) => [destination.name, destination])));
   }
 
-  get offers() {
+  getOffers() {
     return this._load({url: `offers`})
       .then(Api.toJSON)
       .then((offers) => new Map(offers.map((offer) => [offer.type, offer])));
@@ -43,6 +45,24 @@ export default class Api {
     })
       .then(Api.toJSON)
       .then(EventsModel.adaptToClient);
+  }
+
+  addNewEvent(event) {
+    return this._load({
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(EventsModel.adaptToServer(event)),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON)
+      .then(EventsModel.adaptToClient);
+  }
+
+  deleteEvent(event) {
+    return this._load({
+      url: `points/${event.id}`,
+      method: Method.DELETE
+    });
   }
 
   _load({

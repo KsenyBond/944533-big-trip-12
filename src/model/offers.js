@@ -6,11 +6,11 @@ export default class Offers extends Observer {
     this._offers = null;
   }
 
-  set offers(offers) {
+  setOffers(offers) {
     this._offers = offers;
   }
 
-  get offers() {
+  getOffers() {
     return this._offers;
   }
 }

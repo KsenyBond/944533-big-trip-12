@@ -11,7 +11,8 @@ const Mode = {
 const State = {
   SAVING: `SAVING`,
   DELETING: `DELETING`,
-  ABORTING: `ABORTING`
+  ABORTING: `ABORTING`,
+  FAVORITE: `FAVORITE`
 };
 
 export default class Event {
@@ -26,6 +27,7 @@ export default class Event {
     this._eventComponent = null;
     this._eventEditComponent = null;
 
+    this._rolloutClickHandler = this._rolloutClickHandler.bind(this);
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
@@ -40,9 +42,10 @@ export default class Event {
     const prevEventEditComponent = this._eventEditComponent;
 
     this._eventComponent = new EventView(this._event);
-    this._eventEditComponent = new EventEditView(this._destinationsModel, this._offersModel, this._event);
+    this._eventEditComponent = new EventEditView(this._destinationsModel, this._offersModel, false, this._event);
 
-    this._eventComponent.setRollupClickHandler(this._rollupClickHandler);
+    this._eventComponent.setRolloutClickHandler(this._rolloutClickHandler);
+    this._eventEditComponent.setRollupClickHandler(this._rollupClickHandler);
     this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);
     this._eventEditComponent.setFavoriteChangeHandler(this._favoriteChangeHandler);
@@ -91,6 +94,11 @@ export default class Event {
         this._eventComponent.shake(resetFormState);
         this._eventEditComponent.shake(resetFormState);
         break;
+      case State.FAVORITE:
+        this._eventEditComponent.updateData({
+          isDisabled: true
+        });
+        break;
     }
   }
 
@@ -121,8 +129,13 @@ export default class Event {
     }
   }
 
-  _rollupClickHandler() {
+  _rolloutClickHandler() {
     this._replaceEventToEditForm();
+  }
+
+  _rollupClickHandler() {
+    this._eventEditComponent.reset(this._event);
+    this._replaceEditFormToEvent();
   }
 
   _formSubmitHandler(event) {
@@ -143,7 +156,7 @@ export default class Event {
 
   _favoriteChangeHandler() {
     this._handleEventChange(
-        UserAction.UPDATE_EVENT,
+        UserAction.UPDATE_FAVORITES,
         UpdateType.MINOR,
         Object.assign(
             {},

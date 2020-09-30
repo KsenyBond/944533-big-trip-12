@@ -108,6 +108,14 @@ export default class Trip {
             this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
           });
         break;
+      case UserAction.UPDATE_FAVORITES:
+        this._eventsPresenter[update.id].setViewState(EventPresenterViewState.FAVORITE);
+        this._api.updateEvent(update)
+          .then((response) => this._eventsModel.updateEvent(updateType, response))
+          .catch(() => {
+            this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
+          });
+        break;
     }
   }
 

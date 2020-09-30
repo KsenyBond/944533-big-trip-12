@@ -27,7 +27,7 @@ export default class EventNew {
       return;
     }
 
-    this._eventEditComponent = new EventEditView(this._destinationsModel, this._offersModel);
+    this._eventEditComponent = new EventEditView(this._destinationsModel, this._offersModel, true);
 
     this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
     this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);

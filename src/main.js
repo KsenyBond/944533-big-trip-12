@@ -102,15 +102,15 @@ const prepareTabsAndFilters = () => {
 };
 
 const setData = async () => {
-  const destinationsLoaded = await api.getDestination()
+  await api.getDestination()
     .then((destination) => {
       destinationsModel.setDestinations(destination);
     });
-  const offersLoaded = await api.getOffers()
+  await api.getOffers()
     .then((offers) => {
       offersModel.setOffers(offers);
     });
-  const eventsLoaded = await api.getEvents()
+  await api.getEvents()
     .then((events) => {
       eventsModel.setEvents(UpdateType.INIT, events);
       prepareTabsAndFilters();
@@ -122,4 +122,3 @@ const setData = async () => {
 };
 
 setData();
-

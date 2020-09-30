@@ -106,11 +106,10 @@ const createDestinationInfoTemplate = (isNewEvent, destination, possibleDestinat
     </section>` : ``}`;
 };
 
-const createEventEditTemplate = (data, availableOffers, possibleDestinations) => {
+const createEventEditTemplate = (data, availableOffers, possibleDestinations, isNewEvent) => {
   const {type, destination, startTime, endTime, price, offers: selectedOffers,
     isFavorite, isDisabled, isSaving, isDeleting} = data;
 
-  const isNewEvent = !destination.name;
   const preposition = TRANSFER_TYPES.includes(type) ? `to` : `in`;
   const transferTypesTemplate = createEventTypeItemsTemplate(TRANSFER_TYPES, type, formatTypeName);
   const activityTypesTemplate = createEventTypeItemsTemplate(ACTIVITY_TYPES, type, formatTypeName);
@@ -190,16 +189,18 @@ const createEventEditTemplate = (data, availableOffers, possibleDestinations) =>
 };
 
 export default class EventEdit extends SmartView {
-  constructor(destinationsModel, offersModel, event = BLANK_EVENT) {
+  constructor(destinationsModel, offersModel, isNewEvent, event = BLANK_EVENT) {
     super();
     this._destinationsModel = destinationsModel;
     this._offersModel = offersModel;
+    this._isNewEvent = isNewEvent;
     this._data = EventEdit.parseEventToData(event);
     this._startDatepicker = null;
     this._endDatepicker = null;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
     this._eventTypeChangeHandler = this._eventTypeChangeHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
@@ -213,7 +214,7 @@ export default class EventEdit extends SmartView {
   }
 
   get template() {
-    return createEventEditTemplate(this._data, this._offersModel.getOffers(), this._destinationsModel.getDestinations());
+    return createEventEditTemplate(this._data, this._offersModel.getOffers(), this._destinationsModel.getDestinations(), this._isNewEvent);
   }
 
   restoreHandlers() {
@@ -221,6 +222,7 @@ export default class EventEdit extends SmartView {
     this._setDatepickers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
+    this.setRollupClickHandler(this._callback.rollupClick);
     this.setFavoriteChangeHandler(this._callback.favoriteChange);
   }
 
@@ -247,6 +249,11 @@ export default class EventEdit extends SmartView {
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(EventEdit.parseDataToEvent(this._data));
+  }
+
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.rollupClick();
   }
 
   _favoriteChangeHandler(evt) {
@@ -330,6 +337,13 @@ export default class EventEdit extends SmartView {
   setDeleteClickHandler(callback) {
     this._callback.deleteClick = callback;
     this.element.addEventListener(`reset`, this._formDeleteClickHandler);
+  }
+
+  setRollupClickHandler(callback) {
+    this._callback.rollupClick = callback;
+    if (!this._isNewEvent) {
+      this.element.querySelector(`.event__rollup-btn`).addEventListener(`click`, this._rollupClickHandler);
+    }
   }
 
   setFavoriteChangeHandler(callback) {

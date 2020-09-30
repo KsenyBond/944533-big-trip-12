@@ -113,9 +113,6 @@ export default class Trip {
 
   _handleModelEvent(updateType, update) {
     switch (updateType) {
-      case UpdateType.MINOR:
-        this._eventsPresenter[update.id].init(update);
-        break;
       case UpdateType.MAJOR:
         if (update && typeof update === `boolean`) {
           this._currentSortType = SortType.EVENT;

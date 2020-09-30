@@ -11,8 +11,7 @@ const Mode = {
 const State = {
   SAVING: `SAVING`,
   DELETING: `DELETING`,
-  ABORTING: `ABORTING`,
-  FAVORITE: `FAVORITE`
+  ABORTING: `ABORTING`
 };
 
 export default class Event {
@@ -31,7 +30,6 @@ export default class Event {
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    this._favoriteChangeHandler = this._favoriteChangeHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
   }
 
@@ -46,9 +44,6 @@ export default class Event {
 
     this._eventComponent.setRolloutClickHandler(this._rolloutClickHandler);
     this._eventEditComponent.setRollupClickHandler(this._rollupClickHandler);
-    this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
-    this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);
-    this._eventEditComponent.setFavoriteChangeHandler(this._favoriteChangeHandler);
 
     if (prevEventComponent === null || prevEventEditComponent === null) {
       render(this._eventsListContainer, this._eventComponent, RenderPosition.BEFORE_END);
@@ -94,15 +89,13 @@ export default class Event {
         this._eventComponent.shake(resetFormState);
         this._eventEditComponent.shake(resetFormState);
         break;
-      case State.FAVORITE:
-        this._eventEditComponent.updateData({
-          isDisabled: true
-        });
-        break;
     }
   }
 
   _replaceEventToEditForm() {
+    this._eventEditComponent.setFormSubmitHandler(this._formSubmitHandler);
+    this._eventEditComponent.setDeleteClickHandler(this._deleteClickHandler);
+
     replaceElement(this._eventEditComponent, this._eventComponent);
     document.addEventListener(`keydown`, this._escKeyDownHandler);
     this._handleModeChange();
@@ -151,20 +144,6 @@ export default class Event {
         UserAction.DELETE_EVENT,
         UpdateType.MAJOR,
         event
-    );
-  }
-
-  _favoriteChangeHandler() {
-    this._handleEventChange(
-        UserAction.UPDATE_FAVORITES,
-        UpdateType.MINOR,
-        Object.assign(
-            {},
-            this._event,
-            {
-              isFavorite: !this._event.isFavorite
-            }
-        )
     );
   }
 

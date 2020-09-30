@@ -223,7 +223,6 @@ export default class EventEdit extends SmartView {
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setDeleteClickHandler(this._callback.deleteClick);
     this.setRollupClickHandler(this._callback.rollupClick);
-    this.setFavoriteChangeHandler(this._callback.favoriteChange);
   }
 
   reset(event) {
@@ -258,7 +257,9 @@ export default class EventEdit extends SmartView {
 
   _favoriteChangeHandler(evt) {
     evt.preventDefault();
-    this._callback.favoriteChange();
+    this.updateData({
+      isFavorite: !this._data.isFavorite,
+    });
   }
 
   _eventTypeChangeHandler(evt) {
@@ -346,15 +347,6 @@ export default class EventEdit extends SmartView {
     }
   }
 
-  setFavoriteChangeHandler(callback) {
-    const eventFavoriteButton = this.element.querySelector(`.event__favorite-checkbox`);
-    this._callback.favoriteChange = callback;
-
-    if (eventFavoriteButton) {
-      eventFavoriteButton.addEventListener(`change`, this._favoriteChangeHandler);
-    }
-  }
-
   _setInnerHandlers() {
     this.element
       .querySelector(`.event__type-list`)
@@ -369,6 +361,11 @@ export default class EventEdit extends SmartView {
       this.element
         .querySelector(`.event__details`)
         .addEventListener(`change`, this._selectOffersHandler);
+    }
+    if (!this._isNewEvent) {
+      this.element
+        .querySelector(`.event__favorite-checkbox`)
+        .addEventListener(`change`, this._favoriteChangeHandler);
     }
   }
 

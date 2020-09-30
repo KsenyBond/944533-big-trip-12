@@ -1,7 +1,7 @@
 import SortView from "../view/sort.js";
 import TripDaysView from "../view/trip-days.js";
 import TripDayView from "../view/trip-day.js";
-import TripDayCounterView from "../view/day-counter.js";
+import TripDayCounterView from "../view/trip-day-counter.js";
 import TripEventsListView from "../view/trip-events-list.js";
 import NoEventsView from "../view/no-events.js";
 import LoadingView from "../view/loading.js";
@@ -104,14 +104,6 @@ export default class Trip {
         this._eventsPresenter[update.id].setViewState(EventPresenterViewState.DELETING);
         this._api.deleteEvent(update)
           .then(() => this._eventsModel.deleteEvent(updateType, update))
-          .catch(() => {
-            this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
-          });
-        break;
-      case UserAction.UPDATE_FAVORITES:
-        this._eventsPresenter[update.id].setViewState(EventPresenterViewState.FAVORITE);
-        this._api.updateEvent(update)
-          .then((response) => this._eventsModel.updateEvent(updateType, response))
           .catch(() => {
             this._eventsPresenter[update.id].setViewState(EventPresenterViewState.ABORTING);
           });
